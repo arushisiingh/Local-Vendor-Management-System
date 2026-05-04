@@ -1,0 +1,2838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QuickBite - Registration and Vendor Dashboard</title>
+  <meta name="description" content="QuickBite registration, login, and vendor management dashboard." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #0f172a;
+      --muted: #64748b;
+      --paper: #f8fafc;
+      --surface: rgba(255, 255, 255, 0.85);
+      --line: #e2e8f0;
+      --coral: #f43f5e;
+      --coral-dark: #e11d48;
+      --teal: #0ea5e9;
+      --green: #10b981;
+      --yellow: #f59e0b;
+      --red: #ef4444;
+      --blue: #3b82f6;
+      --shadow: 0 20px 40px rgba(0, 0, 0, 0.06);
+      --font-display: "Outfit", sans-serif;
+      --font-body: "Inter", sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100vh;
+      font-family: var(--font-body);
+      color: var(--ink);
+      background: var(--paper);
+      line-height: 1.5;
+    }
+    button, input, select, textarea { font: inherit; }
+    button { cursor: pointer; border: 0; }
+    a { color: inherit; text-decoration: none; }
+    img { display: block; max-width: 100%; }
+    .hidden { display: none !important; }
+
+    .shell { width: min(1180px, calc(100% - 32px)); margin: 0 auto; }
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: rgba(255, 255, 255, 0.7);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+    }
+    .nav {
+      min-height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-family: var(--font-display);
+      font-size: 1.35rem;
+      font-weight: 800;
+    }
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      border-radius: 8px;
+      color: #fff;
+      background: var(--coral);
+    }
+    .nav-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+
+    .btn {
+      min-height: 42px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-family: var(--font-body);
+      color: var(--ink);
+      background: #f1f5f9;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1); }
+    .btn:active { transform: translateY(0); }
+    .btn-primary { color: #fff; background: linear-gradient(135deg, var(--coral), #fb7185); border: none; box-shadow: 0 4px 14px rgba(244, 63, 94, 0.3); }
+    .btn-primary:hover { background: linear-gradient(135deg, var(--coral-dark), var(--coral)); box-shadow: 0 6px 20px rgba(244, 63, 94, 0.4); }
+    .btn-teal { color: #fff; background: linear-gradient(135deg, var(--teal), #38bdf8); border: none; box-shadow: 0 4px 14px rgba(14, 165, 233, 0.3); }
+    .btn-teal:hover { background: linear-gradient(135deg, #0284c7, var(--teal)); box-shadow: 0 6px 20px rgba(14, 165, 233, 0.4); }
+    .btn-ghost { background: transparent; color: var(--muted); }
+    .btn-ghost:hover { background: rgba(0,0,0,0.05); box-shadow: none; }
+    .btn-danger { color: #fff; background: var(--red); }
+    .btn-block { width: 100%; }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(320px, 0.86fr);
+      gap: 48px;
+      align-items: center;
+      min-height: calc(100vh - 72px);
+      padding: 54px 0 46px;
+    }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 18px;
+      color: var(--teal);
+      font-weight: 900;
+    }
+    h1, h2, h3 {
+      font-family: var(--font-display);
+      line-height: 1.08;
+      letter-spacing: 0;
+    }
+    h1 { max-width: 760px; font-size: clamp(2.4rem, 7vw, 5.4rem); }
+    h2 { font-size: clamp(1.7rem, 4vw, 2.65rem); }
+    h3 { font-size: 1.15rem; }
+    .lead { max-width: 670px; margin-top: 18px; color: var(--muted); font-size: 1.08rem; }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+    .hero-media {
+      min-height: 520px;
+      border-radius: 8px;
+      overflow: hidden;
+      position: relative;
+      box-shadow: var(--shadow);
+      background: #24201d;
+    }
+    .hero-media img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; }
+    .hero-strip {
+      position: absolute;
+      left: 18px;
+      right: 18px;
+      bottom: 18px;
+      display: grid;
+      gap: 6px;
+      padding: 16px;
+      border-radius: 8px;
+      color: #fff;
+      background: rgba(23, 19, 18, 0.74);
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 34px;
+    }
+    .stat {
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+    }
+    .stat strong { display: block; color: var(--coral); font-family: var(--font-display); font-size: 1.45rem; }
+    .stat span { color: var(--muted); font-size: 0.9rem; }
+
+    .page { display: none; padding: 42px 0 70px; }
+    .page.active { display: block; }
+    .page-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 18px; margin-bottom: 26px; }
+    .page-head p { margin-top: 8px; color: var(--muted); }
+    .grid { display: grid; gap: 18px; }
+    .two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .card {
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      border-radius: 16px;
+      background: var(--surface);
+      padding: 24px;
+      box-shadow: 0 4px 24px rgba(15, 23, 42, 0.04);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .card:hover { box-shadow: var(--shadow); }
+    .choice {
+      display: grid;
+      gap: 14px;
+      min-height: 230px;
+      align-content: start;
+    }
+    .choice-icon {
+      width: 58px;
+      height: 58px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      color: #fff;
+      background: var(--teal);
+      font-size: 1.7rem;
+    }
+    .choice.vendor .choice-icon { background: var(--coral); }
+    .muted { color: var(--muted); }
+    .form {
+      display: grid;
+      gap: 16px;
+      max-width: 760px;
+    }
+    .form.wide { max-width: none; }
+    .form-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+    .field { display: grid; gap: 6px; }
+    label { font-weight: 800; font-size: 0.92rem; }
+    input, select, textarea {
+      width: 100%;
+      min-height: 46px;
+      border: 2px solid var(--line);
+      border-radius: 8px;
+      padding: 10px 12px;
+      color: var(--ink);
+      background: #fff;
+      outline: none;
+    }
+    textarea { min-height: 94px; resize: vertical; }
+    input:focus, select:focus, textarea:focus { border-color: var(--teal); box-shadow: 0 0 0 4px rgba(0, 143, 140, 0.11); }
+    input.invalid, select.invalid, textarea.invalid { border-color: var(--red); }
+    input.valid, select.valid, textarea.valid { border-color: var(--green); }
+    .error { min-height: 18px; color: var(--red); font-size: 0.82rem; font-weight: 700; }
+    .hint { color: var(--muted); font-size: 0.84rem; }
+
+    .tabs { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
+    .tab.active { color: #fff; background: var(--teal); }
+    .status {
+      display: inline-flex;
+      align-items: center;
+      min-height: 30px;
+      padding: 4px 10px;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 0.8rem;
+      font-weight: 900;
+    }
+    .status.pending { background: var(--yellow); color: var(--ink); }
+    .status.accepted { background: var(--green); }
+    .status.confirmed { background: var(--blue); }
+    .status.completed { background: var(--green); }
+    .status.delivered { background: var(--green); }
+    .status.cancelled { background: var(--red); }
+    .status.out { background: var(--teal); }
+    .status.rejected { background: var(--red); }
+    .list { display: grid; gap: 12px; }
+    .list-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      background: #fff;
+    }
+    .actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+    .toast-wrap {
+      position: fixed;
+      top: 88px;
+      right: 18px;
+      z-index: 20;
+      display: grid;
+      gap: 10px;
+    }
+    .toast {
+      max-width: 360px;
+      padding: 13px 15px;
+      border-radius: 8px;
+      color: #fff;
+      font-weight: 800;
+      background: var(--teal);
+      box-shadow: var(--shadow);
+    }
+    .toast.error { background: var(--red); }
+    .toast.warn { background: #9d6411; }
+    footer { border-top: 1px solid var(--line); padding: 26px 0; color: var(--muted); }
+
+    /* Modal Styles */
+    .modal-backdrop {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(15, 23, 42, 0.5);
+      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+      z-index: 100;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+    }
+    .modal-backdrop.open { opacity: 1; pointer-events: auto; }
+    .modal-window {
+      background: #fff; border-radius: 8px;
+      padding: 32px; width: min(720px, calc(100% - 32px));
+      max-height: 90vh; overflow-y: auto;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      transform: translateY(20px); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .modal-backdrop.open .modal-window { transform: translateY(0); }
+    .modal-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end; margin-top: 16px; }
+
+    .customer-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .customer-tab.active { color: #fff; background: var(--coral); }
+    .customer-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 340px;
+      gap: 18px;
+      align-items: start;
+    }
+    .customer-sidebar { position: sticky; top: 92px; }
+    .vendor-shop-card {
+      display: grid;
+      grid-template-columns: 74px minmax(0, 1fr) auto;
+      gap: 14px;
+      align-items: center;
+    }
+    .vendor-avatar {
+      width: 74px;
+      height: 74px;
+      display: grid;
+      place-items: center;
+      border-radius: 12px;
+      font-size: 2rem;
+      background: #f8fafc;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+    }
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+      gap: 14px;
+      margin-top: 16px;
+    }
+    .menu-card {
+      display: grid;
+      gap: 10px;
+      min-height: 218px;
+      align-content: start;
+    }
+    .product-photo {
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      object-fit: cover;
+      border-radius: 8px;
+      background: #f1ece5;
+    }
+    .product-photo-sm {
+      width: 86px;
+      height: 70px;
+      object-fit: cover;
+      border-radius: 8px;
+      background: #f1ece5;
+      flex: 0 0 auto;
+    }
+    .menu-emoji { font-size: 2.1rem; }
+    .price { color: var(--coral); font-weight: 900; font-size: 1.1rem; }
+    .cart-lines { display: grid; gap: 10px; margin: 14px 0; }
+    .cart-line {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: center;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--line);
+    }
+    .qty-controls {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 900;
+    }
+    .qty-btn {
+      width: 30px;
+      height: 30px;
+      min-height: 30px;
+      padding: 0;
+      border-radius: 8px;
+    }
+    .order-tracker {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    .tracker-pill {
+      padding: 5px 9px;
+      border-radius: 8px;
+      background: #f1ece5;
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 900;
+    }
+    .tracker-pill.done { background: rgba(22, 128, 60, 0.12); color: var(--green); }
+    .tracker-pill.active { background: rgba(239, 79, 63, 0.13); color: var(--coral-dark); }
+    .payment-options {
+      display: grid;
+      gap: 8px;
+      margin-top: 14px;
+    }
+    .payment-options label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+    .payment-options input {
+      width: auto;
+      min-height: auto;
+    }
+    .veg-toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      margin-top: 14px;
+    }
+    .switch {
+      position: relative;
+      width: 54px;
+      height: 30px;
+      flex: 0 0 auto;
+    }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      inset: 0;
+      border-radius: 999px;
+      background: #d8d3cc;
+      transition: 180ms ease;
+    }
+    .slider::before {
+      content: "";
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      left: 3px;
+      top: 3px;
+      border-radius: 50%;
+      background: #fff;
+      transition: 180ms ease;
+      box-shadow: 0 2px 7px rgba(0,0,0,0.2);
+    }
+    .switch input:checked + .slider { background: var(--green); }
+    .switch input:checked + .slider::before { transform: translateX(24px); }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      min-height: 26px;
+      padding: 3px 8px;
+      border-radius: 8px;
+      background: #f1ece5;
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 900;
+    }
+    .badge.green { color: var(--green); background: rgba(22, 128, 60, 0.12); }
+    .badge.red { color: var(--red); background: rgba(202, 39, 55, 0.12); }
+    .chart {
+      display: grid;
+      gap: 12px;
+      margin-top: 14px;
+    }
+    .bar-row {
+      display: grid;
+      grid-template-columns: 120px minmax(0, 1fr) 70px;
+      gap: 10px;
+      align-items: center;
+      color: var(--muted);
+      font-weight: 800;
+    }
+    .bar-track {
+      height: 12px;
+      overflow: hidden;
+      border-radius: 8px;
+      background: #f1ece5;
+    }
+    .bar-fill {
+      display: block;
+      height: 100%;
+      border-radius: 8px;
+      background: var(--teal);
+    }
+    .stars {
+      display: inline-flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .star-choice {
+      min-height: 34px;
+      padding: 6px 9px;
+    }
+    .star-choice.active { color: #fff; background: var(--coral); }
+    .rating-note { margin-top: 8px; color: var(--muted); font-size: 0.86rem; }
+
+    @media (max-width: 860px) {
+      .hero, .two, .three, .form-row { grid-template-columns: 1fr; }
+      .customer-layout, .vendor-shop-card { grid-template-columns: 1fr; }
+      .hero { min-height: auto; padding-top: 34px; }
+      .hero-media { min-height: 320px; order: -1; }
+      .stats { grid-template-columns: 1fr; }
+      .page-head { align-items: flex-start; flex-direction: column; }
+      .list-item { align-items: flex-start; flex-direction: column; }
+      .actions { justify-content: flex-start; }
+      .customer-sidebar { position: static; }
+    }
+  </style>
+</head>
+<body>
+  <div class="toast-wrap" id="toast-wrap"></div>
+
+  <header class="topbar">
+    <nav class="nav shell">
+      <a href="#" class="brand" data-page="home" aria-label="QuickBite home">
+        <span class="brand-mark">Q</span>
+        <span>QuickBite</span>
+      </a>
+      <div class="nav-actions">
+        <button class="btn btn-ghost" data-page="register-choice">Register</button>
+        <button class="btn btn-primary" data-page="login">Login</button>
+        <button class="btn btn-teal hidden" id="dashboard-link">Dashboard</button>
+        <button class="btn hidden" id="logout-btn">Logout</button>
+      </div>
+    </nav>
+  </header>
+
+  <main class="shell">
+    <section class="page active" id="page-home">
+      <div class="hero">
+        <div>
+          <p class="eyebrow">Local vendors. Real bookings. One login.</p>
+          <h1>Register, manage, and grow with QuickBite.</h1>
+          <p class="lead">Customers can create an account and sign in. Vendors can register their business, manage products, handle bookings, and track dashboard analytics.</p>
+          <div class="hero-actions">
+            <button class="btn btn-primary" data-page="register-choice">Start Registration</button>
+            <button class="btn" data-page="login">Open Login</button>
+          </div>
+          <div class="stats">
+            <div class="stat"><strong>2</strong><span>Registration paths</span></div>
+            <div class="stat"><strong>1</strong><span>Shared login</span></div>
+            <div class="stat"><strong>5</strong><span>Vendor dashboard tools</span></div>
+          </div>
+        </div>
+        <div class="hero-media">
+          <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1200&q=80" alt="Restaurant team preparing food" />
+          <div class="hero-strip">
+            <strong>Vendor Management System</strong>
+            <span>Profiles, products, inquiries, bookings, and analytics.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="page" id="page-register-choice">
+      <div class="page-head">
+        <div>
+          <h2>Choose Registration Type</h2>
+          <p>Create an account as a customer or list a business as a vendor.</p>
+        </div>
+      </div>
+      <div class="grid two">
+        <article class="card choice">
+          <div class="choice-icon">U</div>
+          <h3>Register as User</h3>
+          <p class="muted">Order, book, and manage your customer profile.</p>
+          <button class="btn btn-teal" data-page="register-user">User Registration</button>
+        </article>
+        <article class="card choice vendor">
+          <div class="choice-icon">V</div>
+          <h3>Register as Vendor</h3>
+          <p class="muted">Create a business account and manage vendor services.</p>
+          <button class="btn btn-primary" data-page="register-vendor">Vendor Registration</button>
+        </article>
+      </div>
+    </section>
+
+    <section class="page" id="page-register-user">
+      <div class="page-head">
+        <div>
+          <h2>User Registration</h2>
+          <p>All mandatory fields are validated before the account is created.</p>
+        </div>
+      </div>
+      <form class="form card" id="user-form" novalidate>
+        <div class="form-row">
+          <div class="field">
+            <label for="user-name">Full Name *</label>
+            <input id="user-name" autocomplete="name" />
+            <span class="error" id="user-name-error"></span>
+          </div>
+          <div class="field">
+            <label for="user-phone">Phone Number *</label>
+            <input id="user-phone" maxlength="10" inputmode="numeric" autocomplete="tel" />
+            <span class="error" id="user-phone-error"></span>
+          </div>
+        </div>
+        <div class="field">
+          <label for="user-email">Email *</label>
+          <input id="user-email" type="email" autocomplete="email" />
+          <span class="error" id="user-email-error"></span>
+        </div>
+        <div class="form-row">
+          <div class="field">
+            <label for="user-password">Password *</label>
+            <input id="user-password" type="password" autocomplete="new-password" />
+            <span class="hint">Minimum 8 characters, 1 uppercase, 1 number, 1 special character.</span>
+            <span class="error" id="user-password-error"></span>
+          </div>
+          <div class="field">
+            <label for="user-confirm">Confirm Password *</label>
+            <input id="user-confirm" type="password" autocomplete="new-password" />
+            <span class="error" id="user-confirm-error"></span>
+          </div>
+        </div>
+        <div class="field">
+          <label for="user-address">Address</label>
+          <textarea id="user-address" autocomplete="street-address"></textarea>
+          <span class="error" id="user-address-error"></span>
+        </div>
+        <button class="btn btn-teal btn-block" type="submit">Create User Account</button>
+      </form>
+    </section>
+
+    <section class="page" id="page-register-vendor">
+      <div class="page-head">
+        <div>
+          <h2>Vendor Registration</h2>
+          <p>Business details, documents, and strong password checks are required.</p>
+        </div>
+      </div>
+      <form class="form card" id="vendor-form" novalidate>
+        <div class="form-row">
+          <div class="field">
+            <label for="vendor-business">Business Name *</label>
+            <input id="vendor-business" />
+            <span class="error" id="vendor-business-error"></span>
+          </div>
+          <div class="field">
+            <label for="vendor-owner">Owner Name *</label>
+            <input id="vendor-owner" autocomplete="name" />
+            <span class="error" id="vendor-owner-error"></span>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="field">
+            <label for="vendor-email">Email *</label>
+            <input id="vendor-email" type="email" autocomplete="email" />
+            <span class="error" id="vendor-email-error"></span>
+          </div>
+          <div class="field">
+            <label for="vendor-phone">Phone Number *</label>
+            <input id="vendor-phone" maxlength="10" inputmode="numeric" autocomplete="tel" />
+            <span class="error" id="vendor-phone-error"></span>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="field">
+            <label for="vendor-password">Password *</label>
+            <input id="vendor-password" type="password" autocomplete="new-password" />
+            <span class="hint">Minimum 8 characters, 1 uppercase, 1 number, 1 special character.</span>
+            <span class="error" id="vendor-password-error"></span>
+          </div>
+          <div class="field">
+            <label for="vendor-confirm">Confirm Password *</label>
+            <input id="vendor-confirm" type="password" autocomplete="new-password" />
+            <span class="error" id="vendor-confirm-error"></span>
+          </div>
+        </div>
+        <div class="field">
+          <label for="vendor-address">Business Address *</label>
+          <textarea id="vendor-address"></textarea>
+          <span class="error" id="vendor-address-error"></span>
+        </div>
+        <div class="form-row">
+          <div class="field">
+            <label for="vendor-category">Service Category *</label>
+            <select id="vendor-category">
+              <option value="">Select category</option>
+              <option>Food</option>
+              <option>Electronics</option>
+              <option>Services</option>
+              <option>Groceries</option>
+              <option>Health</option>
+              <option>Home Repair</option>
+            </select>
+            <span class="error" id="vendor-category-error"></span>
+          </div>
+          <div class="field">
+            <label for="vendor-gst">GST Number</label>
+            <input id="vendor-gst" maxlength="15" placeholder="22AAAAA0000A1Z5" />
+            <span class="error" id="vendor-gst-error"></span>
+          </div>
+        </div>
+        <div class="field">
+          <label for="vendor-docs">Upload Documents * PDF/JPG/PNG</label>
+          <input id="vendor-docs" type="file" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" />
+          <span class="error" id="vendor-docs-error"></span>
+        </div>
+        <button class="btn btn-primary btn-block" type="submit">Create Vendor Account</button>
+      </form>
+    </section>
+
+    <section class="page" id="page-login">
+      <div class="page-head">
+        <div>
+          <h2>Login</h2>
+          <p>One login identifies whether the account is a user or vendor.</p>
+        </div>
+      </div>
+      <form class="form card" id="login-form" novalidate>
+        <div class="field">
+          <label for="login-email">Email</label>
+          <input id="login-email" type="email" autocomplete="email" />
+          <span class="error" id="login-email-error"></span>
+        </div>
+        <div class="field">
+          <label for="login-password">Password</label>
+          <input id="login-password" type="password" autocomplete="current-password" />
+          <span class="error" id="login-password-error"></span>
+        </div>
+        <span class="error" id="login-form-error"></span>
+        <button class="btn btn-primary btn-block" type="submit">Login</button>
+      </form>
+    </section>
+
+    <section class="page" id="page-user-dashboard">
+      <div class="page-head">
+        <div>
+          <h2>QuickBite User Dashboard</h2>
+          <p id="user-welcome">Browse vendors, add food to cart, place orders, and track them here.</p>
+        </div>
+        <button class="btn btn-primary" id="user-place-order-top">Place Order</button>
+      </div>
+
+      <div class="customer-tabs">
+        <button class="btn customer-tab active" data-customer-panel="browse">Browse Vendors</button>
+        <button class="btn customer-tab" data-customer-panel="orders">My Orders</button>
+        <button class="btn customer-tab" data-customer-panel="wishlist">Wishlist</button>
+        <button class="btn customer-tab" data-customer-panel="notifications">Notifications</button>
+        <button class="btn customer-tab" data-customer-panel="chat">Chat</button>
+        <button class="btn customer-tab" data-customer-panel="profile">Profile</button>
+        <button class="btn customer-tab" data-customer-panel="settings">Settings</button>
+        <button class="btn customer-tab" data-customer-panel="support">Support</button>
+      </div>
+
+      <div class="customer-panel" id="customer-panel-browse">
+        <div class="customer-layout">
+          <div class="grid">
+            <div class="card">
+              <div class="form-row">
+                <div class="field">
+                  <label for="customer-search">Search Vendors</label>
+                  <input id="customer-search" placeholder="Search by vendor, cuisine, or service" />
+                </div>
+                <div class="field">
+                  <label for="customer-filter">Category</label>
+                  <select id="customer-filter">
+                    <option value="all">All</option>
+                    <option>Indian</option>
+                    <option>Chinese</option>
+                    <option>Italian</option>
+                    <option>Desserts</option>
+                    <option>Fast Food</option>
+                    <option>Food</option>
+                    <option>Electronics</option>
+                    <option>Services</option>
+                    <option>Groceries</option>
+                    <option>Health</option>
+                    <option>Home Repair</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row" style="margin-top:14px">
+                <div class="field">
+                  <label for="customer-location-filter">Location</label>
+                  <input id="customer-location-filter" placeholder="Search location or service area" />
+                </div>
+                <div class="field">
+                  <label for="customer-price-filter">Price Range</label>
+                  <select id="customer-price-filter">
+                    <option value="all">All prices</option>
+                    <option value="0-150">Under ₹150</option>
+                    <option value="151-300">₹151 - ₹300</option>
+                    <option value="301-99999">₹301+</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row" style="margin-top:14px">
+                <div class="field">
+                  <label for="customer-rating-filter">Minimum Rating</label>
+                  <select id="customer-rating-filter">
+                    <option value="0">Any rating</option>
+                    <option value="4">4.0+</option>
+                    <option value="4.5">4.5+</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="customer-sort">Sort Results</label>
+                  <select id="customer-sort">
+                    <option value="rating">Rating</option>
+                    <option value="price">Price</option>
+                    <option value="popularity">Popularity</option>
+                  </select>
+                </div>
+              </div>
+              <div class="veg-toggle-row">
+                <div>
+                  <strong>Veg only</strong>
+                  <p class="muted">Filter menus to vegetarian products.</p>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="veg-only-toggle" />
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+            <div class="card hidden" id="customer-menu-card">
+              <div class="page-head" style="margin-bottom:0">
+                <div>
+                  <h3 id="customer-menu-title">Menu</h3>
+                  <p class="muted" id="customer-menu-subtitle"></p>
+                </div>
+                <button class="btn" id="favorite-vendor-btn">Save Vendor</button>
+              </div>
+              <div id="customer-vendor-detail" class="list" style="margin-top:14px"></div>
+              <div class="menu-grid" id="customer-product-list"></div>
+            </div>
+            <div class="list" id="customer-vendor-list"></div>
+          </div>
+          <aside class="card customer-sidebar">
+            <h3>Your Cart</h3>
+            <p class="muted" id="cart-vendor-note">Add items from a vendor to begin.</p>
+            <div class="cart-lines" id="customer-cart-list"></div>
+            <div class="list">
+              <div class="list-item"><span>Subtotal</span><strong id="customer-cart-subtotal">₹0</strong></div>
+              <div class="list-item"><span>Delivery</span><strong id="customer-cart-delivery">₹0</strong></div>
+            <div class="list-item"><span>Taxes</span><strong id="customer-cart-tax">₹0</strong></div>
+            <div class="list-item"><span>Total</span><strong id="customer-cart-total">₹0</strong></div>
+          </div>
+            <div class="payment-options">
+              <label><input type="radio" name="payment-method" value="UPI" checked /> UPI</label>
+              <label><input type="radio" name="payment-method" value="Card" /> Card</label>
+              <label><input type="radio" name="payment-method" value="Cash on Delivery" /> Cash on Delivery</label>
+            </div>
+            <button class="btn btn-primary btn-block" id="customer-place-order" style="margin-top:14px">Place Order</button>
+          </aside>
+        </div>
+      </div>
+
+      <div class="customer-panel hidden" id="customer-panel-orders">
+        <div class="card">
+          <h3>My Orders</h3>
+          <div class="list" id="customer-orders-list" style="margin-top:14px"></div>
+        </div>
+      </div>
+
+      <div class="customer-panel hidden" id="customer-panel-profile">
+        <div class="grid two">
+          <form class="form card wide" id="user-profile-form">
+            <h3>Profile Management</h3>
+            <div class="form-row">
+              <div class="field"><label for="profile-user-name">Full Name</label><input id="profile-user-name" /></div>
+              <div class="field"><label for="profile-user-phone">Phone</label><input id="profile-user-phone" maxlength="10" inputmode="numeric" /></div>
+            </div>
+            <div class="field"><label for="profile-user-email">Email</label><input id="profile-user-email" type="email" /></div>
+            <div class="field"><label for="profile-user-address">Address</label><textarea id="profile-user-address"></textarea></div>
+            <div class="form-row">
+              <div class="field"><label for="profile-user-image">Profile Picture URL</label><input id="profile-user-image" /></div>
+              <div class="field"><label for="profile-user-image-file">Or Upload Picture</label><input id="profile-user-image-file" type="file" accept="image/png,image/jpeg,image/webp" /></div>
+            </div>
+            <button class="btn btn-teal" type="submit">Save Profile</button>
+          </form>
+          <form class="form card wide" id="user-password-form">
+            <h3>Change Password</h3>
+            <div class="field"><label for="profile-old-password">Current Password</label><input id="profile-old-password" type="password" /></div>
+            <div class="field"><label for="profile-new-password">New Password</label><input id="profile-new-password" type="password" /></div>
+            <div class="field"><label for="profile-confirm-password">Confirm New Password</label><input id="profile-confirm-password" type="password" /></div>
+            <p class="muted">Use minimum 8 characters with uppercase, number, and special character.</p>
+            <button class="btn btn-primary" type="submit">Update Password</button>
+          </form>
+        </div>
+        <div class="grid three" style="margin-top:18px">
+          <div class="card"><h3>Profile</h3><div class="muted" id="user-profile"></div></div>
+          <div class="card"><h3>Cart Items</h3><p class="muted" id="user-cart-count">0 items</p></div>
+          <div class="card"><h3>Total Orders</h3><p class="muted" id="user-order-count">0 orders</p></div>
+        </div>
+      </div>
+
+      <div class="customer-panel hidden" id="customer-panel-wishlist">
+        <div class="card">
+          <h3>Wishlist / Favorites</h3>
+          <div class="list" id="customer-wishlist-list" style="margin-top:14px"></div>
+        </div>
+      </div>
+
+      <div class="customer-panel hidden" id="customer-panel-notifications">
+        <div class="card">
+          <h3>Notifications & Alerts</h3>
+          <div class="list" id="customer-notification-list" style="margin-top:14px"></div>
+        </div>
+      </div>
+
+      <div class="customer-panel hidden" id="customer-panel-chat">
+        <div class="grid two">
+          <div class="card">
+            <h3>Chat With Vendors</h3>
+            <div class="list" id="customer-message-list" style="margin-top:14px"></div>
+          </div>
+          <form class="form card wide" id="customer-message-form">
+            <div class="field"><label for="customer-message-vendor">Vendor</label><select id="customer-message-vendor"></select></div>
+            <div class="field"><label for="customer-message-text">Message</label><textarea id="customer-message-text" placeholder="Ask about ingredients, availability, delivery time..."></textarea></div>
+            <button class="btn btn-primary" type="submit">Send Message</button>
+          </form>
+        </div>
+      </div>
+
+      <div class="customer-panel hidden" id="customer-panel-settings">
+        <form class="form card wide" id="customer-settings-form">
+          <h3>Settings & Preferences</h3>
+          <div class="form-row">
+            <div class="field"><label for="customer-pref-notifications">Notifications</label><select id="customer-pref-notifications"><option>Enabled</option><option>Disabled</option></select></div>
+            <div class="field"><label for="customer-pref-language">Language</label><select id="customer-pref-language"><option>English</option><option>Hindi</option><option>Tamil</option></select></div>
+          </div>
+          <div class="form-row">
+            <div class="field"><label for="customer-pref-theme">Theme</label><select id="customer-pref-theme"><option>Light</option><option>Comfort</option></select></div>
+            <div class="field"><label for="customer-pref-privacy">Account Privacy</label><select id="customer-pref-privacy"><option>Standard</option><option>Private</option></select></div>
+          </div>
+          <button class="btn btn-teal" type="submit">Save Preferences</button>
+        </form>
+      </div>
+
+      <div class="customer-panel hidden" id="customer-panel-support">
+        <div class="grid two">
+          <form class="form card wide" id="customer-support-form">
+            <h3>Support & Help</h3>
+            <div class="field"><label for="customer-support-subject">Subject</label><input id="customer-support-subject" /></div>
+            <div class="field"><label for="customer-support-message">Message</label><textarea id="customer-support-message"></textarea></div>
+            <button class="btn btn-primary" type="submit">Raise Ticket</button>
+          </form>
+          <div class="card">
+            <h3>FAQ</h3>
+            <p class="muted">Orders can be tracked in My Orders. Use Chat to ask vendors questions before booking. Wishlist stores vendors and services for quick access.</p>
+            <div class="list" id="customer-support-list" style="margin-top:14px"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="page" id="page-vendor-dashboard">
+      <div class="page-head">
+        <div>
+          <h2>Vendor Dashboard</h2>
+          <p id="vendor-welcome">Manage your business profile, products, bookings, and analytics.</p>
+        </div>
+      </div>
+      <div class="tabs">
+        <button class="btn tab active" data-panel="profile">Business Profile</button>
+        <button class="btn tab" data-panel="products">Products / Services</button>
+        <button class="btn tab" data-panel="bookings">Inquiries / Bookings</button>
+        <button class="btn tab" data-panel="analytics">Analytics</button>
+        <button class="btn tab" data-panel="communication">Chat</button>
+        <button class="btn tab" data-panel="reviews">Reviews</button>
+        <button class="btn tab" data-panel="payments">Payments</button>
+        <button class="btn tab" data-panel="notifications">Alerts</button>
+        <button class="btn tab" data-panel="settings">Settings</button>
+        <button class="btn tab" data-panel="offers">Offers</button>
+        <button class="btn tab" data-panel="support">Support</button>
+      </div>
+
+      <div class="dashboard-panel" id="panel-profile">
+        <form class="form card wide" id="profile-form">
+          <div class="form-row">
+            <div class="field"><label for="profile-business">Business Name</label><input id="profile-business" /></div>
+            <div class="field"><label for="profile-owner">Owner Name</label><input id="profile-owner" /></div>
+          </div>
+          <div class="form-row">
+            <div class="field"><label for="profile-phone">Phone</label><input id="profile-phone" maxlength="10" /></div>
+            <div class="field"><label for="profile-category">Service Category</label><select id="profile-category"><option>Food</option><option>Electronics</option><option>Services</option><option>Groceries</option><option>Health</option><option>Home Repair</option></select></div>
+          </div>
+          <div class="field"><label for="profile-address">Business Address</label><textarea id="profile-address"></textarea></div>
+          <button class="btn btn-teal" type="submit">Save Profile</button>
+        </form>
+      </div>
+
+      <div class="dashboard-panel hidden" id="panel-products">
+        <form class="form card wide" id="product-form">
+          <input type="hidden" id="product-id" />
+          <div class="form-row">
+          <div class="field"><label for="product-name">Product / Service Name</label><input id="product-name" /></div>
+            <div class="field"><label for="product-price">Price</label><input id="product-price" type="number" min="1" /></div>
+          </div>
+          <div class="form-row">
+            <div class="field"><label for="product-category">Category</label><input id="product-category" placeholder="Starter, Main Course, Repair, Consultation" /></div>
+            <div class="field"><label for="product-tags">Tags</label><input id="product-tags" placeholder="spicy, best seller, family pack" /></div>
+          </div>
+          <div class="form-row">
+            <div class="field"><label for="product-pricing-type">Pricing Type</label><select id="product-pricing-type"><option>Fixed</option><option>Dynamic</option><option>Hourly</option><option>Custom Quote</option></select></div>
+            <div class="field"><label for="product-food-type">Veg / Non-Veg</label><select id="product-food-type"><option value="veg">Veg</option><option value="nonveg">Non-Veg</option><option value="na">Not Applicable</option></select></div>
+          </div>
+          <div class="form-row">
+            <div class="field"><label for="product-image">Product Image URL</label><input id="product-image" placeholder="https://example.com/product.jpg" /></div>
+            <div class="field"><label for="product-image-file">Or Upload Product Picture</label><input id="product-image-file" type="file" accept="image/png,image/jpeg,image/webp" /></div>
+          </div>
+          <div class="form-row">
+            <div class="field"><label for="product-video">Product Video URL</label><input id="product-video" placeholder="https://example.com/demo.mp4" /></div>
+            <div class="field"><label for="product-available">Availability</label><select id="product-available"><option value="true">Available</option><option value="false">Unavailable</option></select></div>
+          </div>
+          <div class="field"><label for="product-desc">Description</label><textarea id="product-desc"></textarea></div>
+          <button class="btn btn-primary" type="submit" id="product-submit">Add Product</button>
+        </form>
+        <div class="card" style="margin-top:18px">
+          <h3>Current Products / Services</h3>
+          <div class="list" id="product-list" style="margin-top:14px"></div>
+        </div>
+      </div>
+
+      <div class="dashboard-panel hidden" id="panel-bookings">
+        <div class="grid two">
+          <div class="card">
+            <h3>User Inquiries / Bookings</h3>
+            <div class="list" id="booking-list" style="margin-top:14px"></div>
+          </div>
+          <div class="card">
+            <h3>Booking Calendar</h3>
+            <div class="list" id="booking-calendar" style="margin-top:14px"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dashboard-panel hidden" id="panel-analytics">
+        <div class="grid three">
+          <div class="card"><h3>Total Products</h3><p class="stat"><strong id="metric-products">0</strong><span>Active listings</span></p></div>
+          <div class="card"><h3>Total Bookings</h3><p class="stat"><strong id="metric-bookings">0</strong><span>Customer inquiries</span></p></div>
+          <div class="card"><h3>Accepted</h3><p class="stat"><strong id="metric-accepted">0</strong><span>Approved bookings</span></p></div>
+          <div class="card"><h3>Payments Received</h3><p class="stat"><strong id="metric-payments">₹0</strong><span>Paid customer orders</span></p></div>
+          <div class="card"><h3>Average Rating</h3><p class="stat"><strong id="metric-rating">No ratings</strong><span>Customer product ratings</span></p></div>
+          <div class="card"><h3>Pending Payment</h3><p class="stat"><strong id="metric-pending-payment">₹0</strong><span>Cash on delivery orders</span></p></div>
+          <div class="card"><h3>Active Customers</h3><p class="stat"><strong id="metric-active-customers">0</strong><span>Unique buyers</span></p></div>
+          <div class="card"><h3>Conversion Rate</h3><p class="stat"><strong id="metric-conversion">0%</strong><span>Orders per product view</span></p></div>
+          <div class="card"><h3>Retention Rate</h3><p class="stat"><strong id="metric-retention">0%</strong><span>Repeat customers</span></p></div>
+        </div>
+        <div class="grid two" style="margin-top:18px">
+          <div class="card">
+            <h3>Weekly Performance</h3>
+            <div class="chart" id="weekly-chart"></div>
+          </div>
+          <div class="card">
+            <h3>Top Selling Products</h3>
+            <div class="list" id="top-products-list" style="margin-top:14px"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dashboard-panel hidden" id="panel-communication">
+        <div class="grid two">
+          <div class="card">
+            <h3>Customer Chat</h3>
+            <div class="list" id="message-list" style="margin-top:14px"></div>
+          </div>
+          <form class="form card wide" id="message-form">
+            <div class="field"><label for="message-customer">Customer</label><select id="message-customer"></select></div>
+            <div class="field"><label for="message-text">Send Update</label><textarea id="message-text" placeholder="Your order is being prepared..."></textarea></div>
+            <div class="field"><label for="auto-reply">Auto Reply</label><select id="auto-reply"><option value="off">Off</option><option value="on">On - send preparation update</option></select></div>
+            <button class="btn btn-primary" type="submit">Send Message</button>
+          </form>
+        </div>
+      </div>
+
+      <div class="dashboard-panel hidden" id="panel-reviews">
+        <div class="card">
+          <h3>Reviews & Ratings</h3>
+          <div class="list" id="review-list" style="margin-top:14px"></div>
+        </div>
+      </div>
+
+      <div class="dashboard-panel hidden" id="panel-payments">
+        <div class="grid two">
+          <div class="card">
+            <h3>Payment History</h3>
+            <div class="list" id="payment-history" style="margin-top:14px"></div>
+          </div>
+          <div class="card">
+            <h3>Withdraw</h3>
+            <p class="muted" id="withdraw-summary">No payout available yet.</p>
+            <button class="btn btn-teal" id="withdraw-btn" style="margin-top:14px">Request Withdrawal</button>
+            <button class="btn" id="download-invoice-btn" style="margin-top:14px">Download Receipts CSV</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="dashboard-panel hidden" id="panel-notifications">
+        <div class="card">
+          <h3>Notifications & Alerts</h3>
+          <div class="list" id="notification-list" style="margin-top:14px"></div>
+        </div>
+      </div>
+
+      <div class="dashboard-panel hidden" id="panel-settings">
+        <form class="form card wide" id="settings-form">
+          <div class="form-row">
+            <div class="field"><label for="settings-logo">Logo URL</label><input id="settings-logo" /></div>
+            <div class="field"><label for="settings-banner">Banner URL</label><input id="settings-banner" /></div>
+          </div>
+          <div class="form-row">
+            <div class="field"><label for="settings-hours">Working Hours</label><input id="settings-hours" placeholder="10:00 AM - 10:00 PM" /></div>
+            <div class="field"><label for="settings-days">Working Days</label><input id="settings-days" placeholder="Mon-Sun" /></div>
+          </div>
+          <div class="form-row">
+            <div class="field"><label for="settings-location">Business Location</label><input id="settings-location" placeholder="Chennai, Tamil Nadu" /></div>
+            <div class="field"><label for="settings-service-area">Service Area</label><input id="settings-service-area" placeholder="5 km around store" /></div>
+          </div>
+          <div class="field"><label for="settings-slots">Time Slots</label><input id="settings-slots" placeholder="Lunch 12-3, Dinner 7-11" /></div>
+          <div class="form-row">
+            <div class="field"><label for="settings-password">Change Password</label><input id="settings-password" type="password" placeholder="Leave blank to keep current" /></div>
+            <div class="field"><label for="settings-availability">Availability</label><select id="settings-availability"><option>Open</option><option>Closed</option></select></div>
+          </div>
+          <button class="btn btn-teal" type="submit">Save Settings</button>
+        </form>
+      </div>
+
+      <div class="dashboard-panel hidden" id="panel-offers">
+        <div class="grid two">
+          <form class="form card wide" id="offer-form">
+            <div class="form-row">
+              <div class="field"><label for="offer-code">Coupon Code</label><input id="offer-code" placeholder="QUICK20" /></div>
+              <div class="field"><label for="offer-discount">Discount %</label><input id="offer-discount" type="number" min="1" max="90" /></div>
+            </div>
+            <div class="field"><label for="offer-desc">Campaign Details</label><textarea id="offer-desc" placeholder="Weekend combo discount"></textarea></div>
+            <button class="btn btn-primary" type="submit">Create Offer</button>
+          </form>
+          <div class="card">
+            <h3>Active Promotions</h3>
+            <div class="list" id="offer-list" style="margin-top:14px"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dashboard-panel hidden" id="panel-support">
+        <div class="grid two">
+          <form class="form card wide" id="support-form">
+            <h3>Raise Support Ticket</h3>
+            <div class="field"><label for="support-subject">Subject</label><input id="support-subject" /></div>
+            <div class="field"><label for="support-message">Message</label><textarea id="support-message"></textarea></div>
+            <button class="btn btn-primary" type="submit">Submit Ticket</button>
+          </form>
+          <div class="card">
+            <h3>Help & FAQ</h3>
+            <p class="muted">Use Products to manage listings. Use Bookings to confirm, complete, cancel, or reschedule orders. Use Payments to track payout status.</p>
+            <div class="list" id="support-list" style="margin-top:14px"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="shell">QuickBite © 2026. Client-side demo for registration, login, and vendor management.</div>
+  </footer>
+
+  <div class="modal-backdrop" id="checkout-modal" aria-hidden="true">
+    <div class="modal-window" role="dialog" aria-modal="true" aria-labelledby="checkout-title">
+      <h2 id="checkout-title">Delivery Details</h2>
+      <p class="muted" style="margin-top:8px">Confirm your address, contact number, and special requests before placing the order.</p>
+      <form class="form wide" id="checkout-form" style="margin-top:18px" novalidate>
+        <div class="form-row">
+          <div class="field">
+            <label for="checkout-phone">Phone Number *</label>
+            <input id="checkout-phone" maxlength="10" inputmode="numeric" />
+            <span class="error" id="checkout-phone-error"></span>
+          </div>
+          <div class="field">
+            <label for="checkout-name">Receiver Name *</label>
+            <input id="checkout-name" />
+            <span class="error" id="checkout-name-error"></span>
+          </div>
+        </div>
+        <div class="field">
+          <label for="checkout-address">Delivery Address *</label>
+          <textarea id="checkout-address" placeholder="Flat number, building, street, area, city"></textarea>
+          <span class="error" id="checkout-address-error"></span>
+        </div>
+        <div class="form-row">
+          <div class="field">
+            <label for="checkout-landmark">Landmark</label>
+            <input id="checkout-landmark" placeholder="Near park, gate number, etc." />
+          </div>
+          <div class="field">
+            <label for="checkout-slot">Delivery Slot</label>
+            <select id="checkout-slot">
+              <option>ASAP</option>
+              <option>30-45 minutes</option>
+              <option>Tonight 8:00 PM</option>
+              <option>Tomorrow morning</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="field"><label for="checkout-date">Booking / Delivery Date</label><input id="checkout-date" type="date" /></div>
+          <div class="field"><label for="checkout-time">Booking / Delivery Time</label><input id="checkout-time" type="time" /></div>
+        </div>
+        <div class="field">
+          <label for="checkout-request">Special Request</label>
+          <textarea id="checkout-request" placeholder="Less spicy, no cutlery, call before arrival..."></textarea>
+        </div>
+        <div class="modal-actions">
+          <button class="btn" type="button" id="checkout-cancel">Cancel</button>
+          <button class="btn btn-primary" type="submit">Confirm & Place Order</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+  <script>
+    const API_BASE = window.QUICKBITE_API_BASE || "http://127.0.0.1:5001/api";
+    const STORE_KEY = "quickbite_roles_demo";
+    const seed = {
+      users: [],
+      vendors: [],
+      session: null,
+      customerSearch: "",
+      customerFilter: "all",
+      customerLocationFilter: "",
+      customerPriceFilter: "all",
+      customerRatingFilter: "0",
+      customerSort: "rating",
+      vegOnly: false,
+      selectedVendorId: "seed-1",
+      messages: [],
+      notifications: [],
+      supportTickets: [],
+      bookings: [
+        { id: "B1001", vendorEmail: null, customer: "Aarav Mehta", service: "Birthday catering inquiry", status: "Pending" },
+        { id: "B1002", vendorEmail: null, customer: "Diya Shah", service: "Weekly lunch subscription", status: "Pending" }
+      ]
+    };
+    const DEFAULT_VENDORS = [
+      {
+        id: "seed-1", name: "Spice Garden", category: "Indian", rating: 4.7, deliveryTime: "25-35 min", deliveryFee: 30, icon: "🍛",
+        products: [
+          { id: "101", name: "Paneer Tikka", price: 180, emoji: "🧀", desc: "Grilled cottage cheese with spices" },
+          { id: "102", name: "Chicken Biryani", price: 280, emoji: "🍚", desc: "Fragrant basmati rice with tender chicken" },
+          { id: "103", name: "Dal Makhani", price: 160, emoji: "🫘", desc: "Slow-cooked black lentils" },
+          { id: "104", name: "Butter Naan", price: 40, emoji: "🫓", desc: "Fluffy leavened bread with butter" }
+        ]
+      },
+      {
+        id: "seed-2", name: "Dragon Wok", category: "Chinese", rating: 4.5, deliveryTime: "20-30 min", deliveryFee: 25, icon: "🥢",
+        products: [
+          { id: "201", name: "Hot & Sour Soup", price: 120, emoji: "🍲", desc: "Tangy soup with vegetables" },
+          { id: "202", name: "Hakka Noodles", price: 150, emoji: "🍜", desc: "Stir-fried noodles with veggies" },
+          { id: "203", name: "Fried Rice", price: 140, emoji: "🍳", desc: "Wok-tossed rice with egg and vegetables" },
+          { id: "204", name: "Veg Dim Sum", price: 160, emoji: "🥟", desc: "Steamed dumplings with vegetable filling" }
+        ]
+      },
+      {
+        id: "seed-3", name: "La Bella Italia", category: "Italian", rating: 4.8, deliveryTime: "30-45 min", deliveryFee: 40, icon: "🍝",
+        products: [
+          { id: "301", name: "Margherita Pizza", price: 320, emoji: "🍕", desc: "Tomato, mozzarella, and basil" },
+          { id: "302", name: "Carbonara Pasta", price: 280, emoji: "🍝", desc: "Creamy pasta with bacon and egg" },
+          { id: "303", name: "Tiramisu", price: 180, emoji: "🍰", desc: "Classic Italian coffee dessert" },
+          { id: "304", name: "Caesar Salad", price: 200, emoji: "🥗", desc: "Romaine, croutons, and parmesan" }
+        ]
+      },
+      {
+        id: "seed-4", name: "Sweet Cravings", category: "Desserts", rating: 4.6, deliveryTime: "15-25 min", deliveryFee: 20, icon: "🧁",
+        products: [
+          { id: "401", name: "Chocolate Lava Cake", price: 150, emoji: "🎂", desc: "Warm cake with molten chocolate centre" },
+          { id: "402", name: "Belgian Waffle", price: 180, emoji: "🧇", desc: "Crispy waffle with toppings" },
+          { id: "403", name: "Mango Gelato", price: 120, emoji: "🍨", desc: "Creamy mango ice cream" },
+          { id: "404", name: "Croissant", price: 80, emoji: "🥐", desc: "Buttery flaky pastry" }
+        ]
+      },
+      {
+        id: "seed-5", name: "Burger Barn", category: "Fast Food", rating: 4.3, deliveryTime: "15-20 min", deliveryFee: 20, icon: "🍔",
+        products: [
+          { id: "501", name: "Classic Smash Burger", price: 220, emoji: "🍔", desc: "Double smash patty with special sauce" },
+          { id: "502", name: "Crispy Chicken Burger", price: 240, emoji: "🍗", desc: "Fried chicken with pickles" },
+          { id: "503", name: "Loaded Fries", price: 120, emoji: "🍟", desc: "Crispy fries with cheese sauce" },
+          { id: "504", name: "Thick Shake", price: 100, emoji: "🥤", desc: "Creamy milkshake" }
+        ]
+      }
+    ];
+    const DELIVERY_PARTNERS = [
+      { name: "Ramesh Kumar", phone: "9876543210", rating: 4.8 },
+      { name: "Amit Singh", phone: "9123456780", rating: 4.6 },
+      { name: "Kiran Rao", phone: "9988776655", rating: 4.9 }
+    ];
+    let db = JSON.parse(localStorage.getItem(STORE_KEY) || JSON.stringify(seed));
+    db.customerSearch = db.customerSearch || "";
+    db.customerFilter = db.customerFilter || "all";
+    db.customerLocationFilter = db.customerLocationFilter || "";
+    db.customerPriceFilter = db.customerPriceFilter || "all";
+    db.customerRatingFilter = db.customerRatingFilter || "0";
+    db.customerSort = db.customerSort || "rating";
+    db.vegOnly = !!db.vegOnly;
+    db.selectedVendorId = db.selectedVendorId || "seed-1";
+    db.messages = db.messages || [];
+    db.notifications = db.notifications || [];
+    db.supportTickets = db.supportTickets || [];
+    db.users.forEach(user => {
+      user.cart = user.cart || [];
+      user.orders = user.orders || [];
+      user.wishlist = user.wishlist || [];
+      user.notifications = user.notifications || [];
+      user.preferences = user.preferences || { notifications: "Enabled", language: "English", theme: "Light", privacy: "Standard" };
+    });
+    db.vendors.forEach(vendor => {
+      vendor.products = vendor.products || [];
+      vendor.settings = vendor.settings || {};
+      vendor.offers = vendor.offers || [];
+      vendor.products.forEach(product => {
+        product.available = product.available !== false;
+        product.foodType = product.foodType || "veg";
+        product.category = product.category || vendor.category;
+        product.tags = product.tags || "";
+        product.pricingType = product.pricingType || "Fixed";
+        product.views = product.views || 0;
+      });
+    });
+
+    const $ = (id) => document.getElementById(id);
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const namePattern = /^[A-Za-z ]{2,60}$/;
+    const phonePattern = /^\d{10}$/;
+    const passwordPattern = /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
+    const gstPattern = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/;
+
+    function save() { localStorage.setItem(STORE_KEY, JSON.stringify(db)); }
+    async function apiRequest(path, options = {}) {
+      const response = await fetch(API_BASE + path, {
+        method: options.method || "GET",
+        headers: {
+          "Content-Type": "application/json",
+          ...(options.headers || {})
+        },
+        body: options.body
+      });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok || payload.success === false) {
+        throw new Error(payload.message || "Request failed.");
+      }
+      return payload.data;
+    }
+    function allAccounts() { return [...db.users, ...db.vendors]; }
+    function currentAccount() {
+      if (!db.session) return null;
+      return db.session.role === "vendor"
+        ? db.vendors.find(v => v.email === db.session.email)
+        : db.users.find(u => u.email === db.session.email);
+    }
+    function escapeHTML(value) {
+      return String(value || "").replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" }[ch]));
+    }
+    function shopVendors() {
+      const registered = db.vendors.map(v => ({
+        id: "vendor-" + v.email,
+        email: v.email,
+        name: v.businessName,
+        category: v.category,
+        rating: vendorAverageRating(v.email) || 4.2,
+        deliveryTime: "25-40 min",
+        deliveryFee: 30,
+        location: (v.settings && v.settings.location) || v.businessAddress || "Local area",
+        serviceArea: (v.settings && v.settings.serviceArea) || "Nearby",
+        availability: (v.settings && v.settings.availability) || "Open",
+        businessInfo: v.ownerName + " • GST " + (v.gst || "Not provided"),
+        icon: v.category === "Food" ? "🍽" : v.category === "Electronics" ? "🔌" : v.category === "Groceries" ? "🛒" : "🧰",
+        products: v.products
+          .filter(p => p.available !== false)
+          .map(p => ({ id: p.id, name: p.name, price: p.price, emoji: "🍴", desc: p.desc || "Vendor listing", image: p.image || "", foodType: p.foodType || "veg", tags: p.tags || "", category: p.category || v.category }))
+      }));
+      return [...DEFAULT_VENDORS.map(v => ({ ...v, location: "Central Market", serviceArea: "5 km radius", availability: "Open", businessInfo: v.category + " kitchen", products: v.products.map(p => ({ ...p, foodType: productFoodType(p) })) })), ...registered];
+    }
+    function selectedShopVendor() {
+      return shopVendors().find(v => v.id === db.selectedVendorId) || shopVendors()[0];
+    }
+    function ensureCustomerState(user) {
+      user.cart = user.cart || [];
+      user.orders = user.orders || [];
+      user.wishlist = user.wishlist || [];
+      user.notifications = user.notifications || [];
+      user.preferences = user.preferences || { notifications: "Enabled", language: "English", theme: "Light", privacy: "Standard" };
+    }
+    function productRatingSummary(vendorEmail, productId) {
+      const ratings = [];
+      db.users.forEach(user => {
+        (user.orders || []).forEach(order => {
+          if (vendorEmail && order.vendorEmail !== vendorEmail) return;
+          (order.items || []).forEach(item => {
+            if (item.productId === productId && item.rating) ratings.push(Number(item.rating));
+          });
+        });
+      });
+      if (!ratings.length) return { average: 0, count: 0 };
+      return { average: ratings.reduce((sum, n) => sum + n, 0) / ratings.length, count: ratings.length };
+    }
+    function vendorAverageRating(vendorEmail) {
+      const ratings = [];
+      db.users.forEach(user => (user.orders || []).forEach(order => {
+        if (order.vendorEmail !== vendorEmail) return;
+        (order.items || []).forEach(item => { if (item.rating) ratings.push(Number(item.rating)); });
+      }));
+      return ratings.length ? ratings.reduce((sum, n) => sum + n, 0) / ratings.length : 0;
+    }
+    function productFoodType(product) {
+      if (product.foodType) return product.foodType;
+      return /chicken|bacon|egg|patty/i.test(product.name) ? "nonveg" : "veg";
+    }
+    function parsePriceRange(value) {
+      if (!value || value === "all") return [0, Infinity];
+      const [min, max] = value.split("-").map(Number);
+      return [Number.isFinite(min) ? min : 0, Number.isFinite(max) ? max : Infinity];
+    }
+    function transactionFee(paymentMethod, amount) {
+      if (paymentMethod === "UPI") return Math.round(amount * 0.01);
+      if (paymentMethod === "Card") return Math.round(amount * 0.02);
+      return 0;
+    }
+    function createTransactionDetails(paymentMethod, amount) {
+      return {
+        id: "TXN" + Date.now().toString().slice(-8),
+        method: paymentMethod,
+        status: paymentMethod === "Cash on Delivery" ? "Pending" : "Paid",
+        amount,
+        fee: transactionFee(paymentMethod, amount),
+        date: new Date().toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })
+      };
+    }
+    function cancellationBreakdown(order) {
+      const now = Date.now();
+      const placedAt = order.createdAtTs || now;
+      const minutesSincePlaced = Math.max(0, Math.round((now - placedAt) / 60000));
+      let feeRate = 0.08;
+      let reason = "Early cancellation fee";
+      if (minutesSincePlaced >= 30 && minutesSincePlaced < 90) {
+        feeRate = 0.18;
+        reason = "Standard cancellation fee";
+      }
+      if (minutesSincePlaced >= 90 || ["Accepted", "Out for Delivery", "Confirmed"].includes(order.status)) {
+        feeRate = 0.35;
+        reason = "Late cancellation fee";
+      }
+      if (order.status === "Delivered" || order.status === "Completed") {
+        feeRate = 1;
+        reason = "Delivered orders are not refundable";
+      }
+      const fee = Math.min(order.total, Math.round(order.total * feeRate));
+      const refund = Math.max(0, order.total - fee);
+      return { feeRate, fee, refund, reason, minutesSincePlaced };
+    }
+    function normalizeCancellation(data) {
+      return {
+        feeRate: Number(data.feePercent || 0) / 100,
+        fee: Number(data.feeAmount || 0),
+        refund: Number(data.refundAmount || 0),
+        reason: data.reason || "Cancellation processed",
+        refundStatus: data.refundStatus || "",
+        refundId: data.refundId || ""
+      };
+    }
+    function openRazorpayCheckout(options) {
+      return new Promise((resolve, reject) => {
+        if (!window.Razorpay) {
+          reject(new Error("Razorpay Checkout failed to load."));
+          return;
+        }
+        let settled = false;
+        const instance = new window.Razorpay({
+          key: options.keyId,
+          amount: options.amount,
+          currency: options.currency,
+          name: "QuickBite",
+          description: "Order payment",
+          order_id: options.orderId,
+          method: options.method === "Card" ? "card" : "upi",
+          prefill: {
+            name: options.customerName,
+            email: options.customerEmail,
+            contact: options.customerPhone
+          },
+          notes: {
+            frontendOrderId: options.frontendOrderId,
+            vendorName: options.vendorName
+          },
+          theme: { color: "#f43f5e" },
+          modal: {
+            ondismiss() {
+              if (!settled) {
+                settled = true;
+                reject(new Error("Payment window was closed before completion."));
+              }
+            }
+          },
+          handler(response) {
+            settled = true;
+            resolve(response);
+          }
+        });
+        instance.on("payment.failed", event => {
+          if (settled) return;
+          settled = true;
+          const reason = event && event.error && (event.error.description || event.error.reason);
+          reject(new Error(reason || "Payment failed."));
+        });
+        instance.open();
+      });
+    }
+    function vendorOrders(vendorEmail) {
+      return db.users.flatMap(user => (user.orders || []).filter(order => order.vendorEmail === vendorEmail).map(order => ({ ...order, customerName: user.name, customerEmail: user.email })));
+    }
+    function notify(vendorEmail, message, type = "System") {
+      db.notifications.push({ id: "N" + Date.now(), vendorEmail, message, type, date: new Date().toLocaleString("en-IN") });
+    }
+    function notifyCustomer(userEmail, message, type = "System") {
+      const user = db.users.find(u => u.email === userEmail);
+      if (!user) return;
+      ensureCustomerState(user);
+      if (user.preferences.notifications === "Disabled") return;
+      user.notifications.push({ id: "CN" + Date.now(), message, type, date: new Date().toLocaleString("en-IN") });
+    }
+    function toast(message, type = "ok") {
+      const el = document.createElement("div");
+      el.className = "toast" + (type === "error" ? " error" : type === "warn" ? " warn" : "");
+      el.textContent = message;
+      $("toast-wrap").appendChild(el);
+      setTimeout(() => el.remove(), 3200);
+    }
+    function mark(id, message = "") {
+      const input = $(id);
+      const err = $(id + "-error");
+      if (err) err.textContent = message;
+      if (input) {
+        input.classList.toggle("invalid", !!message);
+        input.classList.toggle("valid", !message && input.value !== "");
+      }
+      return !message;
+    }
+    function resetErrors(form) {
+      form.querySelectorAll(".error").forEach(e => e.textContent = "");
+      form.querySelectorAll("input, select, textarea").forEach(i => i.classList.remove("invalid", "valid"));
+    }
+    function uniqueEmail(email, existingEmail = "") {
+      return !allAccounts().some(a => a.email.toLowerCase() === email.toLowerCase() && a.email !== existingEmail);
+    }
+    function uniquePhone(phone, existingPhone = "") {
+      return !allAccounts().some(a => a.phone === phone && a.phone !== existingPhone);
+    }
+    function page(name) {
+      document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+      $("page-" + name).classList.add("active");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      if (name === "user-dashboard") renderUserDashboard();
+      if (name === "vendor-dashboard") renderVendorDashboard();
+    }
+    function setNav() {
+      const account = currentAccount();
+      $("dashboard-link").classList.toggle("hidden", !account);
+      $("logout-btn").classList.toggle("hidden", !account);
+    }
+    function validateCommon(prefix, existing = {}) {
+      let ok = true;
+      const email = $(prefix + "-email").value.trim();
+      const phone = $(prefix + "-phone").value.trim();
+      const pass = $(prefix + "-password").value;
+      const confirm = $(prefix + "-confirm").value;
+      ok = mark(prefix + "-email", !email ? "Email is required." : !emailPattern.test(email) ? "Enter a valid email address." : !uniqueEmail(email, existing.email) ? "Email already exists." : "") && ok;
+      ok = mark(prefix + "-phone", !phone ? "Phone number is required." : !phonePattern.test(phone) ? "Phone must be exactly 10 digits." : !uniquePhone(phone, existing.phone) ? "Phone number already exists." : "") && ok;
+      ok = mark(prefix + "-password", !pass ? "Password is required." : !passwordPattern.test(pass) ? "Use min 8 chars with uppercase, number, and special character." : "") && ok;
+      ok = mark(prefix + "-confirm", confirm !== pass ? "Confirm password must match password." : "") && ok;
+      return ok;
+    }
+
+    document.querySelectorAll("[data-page]").forEach(el => el.addEventListener("click", e => {
+      e.preventDefault();
+      page(el.dataset.page);
+    }));
+
+    ["user-phone", "vendor-phone", "profile-phone"].forEach(id => $(id).addEventListener("input", e => {
+      e.target.value = e.target.value.replace(/\D/g, "").slice(0, 10);
+    }));
+    $("vendor-gst").addEventListener("input", e => { e.target.value = e.target.value.toUpperCase(); });
+
+    $("user-form").addEventListener("submit", e => {
+      e.preventDefault();
+      resetErrors(e.currentTarget);
+      let ok = true;
+      const name = $("user-name").value.trim();
+      ok = mark("user-name", !name ? "Full name is required." : !namePattern.test(name) ? "Use alphabets and spaces only." : "") && ok;
+      ok = validateCommon("user") && ok;
+      if (!ok) return;
+      db.users.push({
+        role: "user",
+        name,
+        email: $("user-email").value.trim(),
+        phone: $("user-phone").value.trim(),
+        password: $("user-password").value,
+        address: $("user-address").value.trim(),
+        cart: [],
+        orders: [],
+        wishlist: [],
+        notifications: [],
+        preferences: { notifications: "Enabled", language: "English", theme: "Light", privacy: "Standard" }
+      });
+      db.session = { role: "user", email: $("user-email").value.trim() };
+      save();
+      setNav();
+      toast("User registered successfully.");
+      page("user-dashboard");
+    });
+
+    $("vendor-form").addEventListener("submit", e => {
+      e.preventDefault();
+      resetErrors(e.currentTarget);
+      let ok = true;
+      const file = $("vendor-docs").files[0];
+      const gst = $("vendor-gst").value.trim().toUpperCase();
+      ok = mark("vendor-business", !$("vendor-business").value.trim() ? "Business name is required." : "") && ok;
+      ok = mark("vendor-owner", !$("vendor-owner").value.trim() ? "Owner name is required." : "") && ok;
+      ok = validateCommon("vendor") && ok;
+      ok = mark("vendor-address", !$("vendor-address").value.trim() ? "Business address is required." : "") && ok;
+      ok = mark("vendor-category", !$("vendor-category").value ? "Select a service category." : "") && ok;
+      ok = mark("vendor-gst", gst && !gstPattern.test(gst) ? "Enter a valid 15-character GST number." : "") && ok;
+      ok = mark("vendor-docs", !file ? "Upload ID proof or business proof." : !["application/pdf", "image/jpeg", "image/png"].includes(file.type) ? "Only PDF, JPG, or PNG files are allowed." : "") && ok;
+      if (!ok) return;
+      const vendor = {
+        role: "vendor",
+        businessName: $("vendor-business").value.trim(),
+        ownerName: $("vendor-owner").value.trim(),
+        email: $("vendor-email").value.trim(),
+        phone: $("vendor-phone").value.trim(),
+        password: $("vendor-password").value,
+        businessAddress: $("vendor-address").value.trim(),
+        category: $("vendor-category").value,
+        gst,
+        documentName: file.name,
+        settings: { availability: "Open", hours: "10:00 AM - 10:00 PM", days: "Mon-Sun", location: $("vendor-address").value.trim(), serviceArea: "5 km around store", slots: "Lunch 12-3, Dinner 7-11" },
+        offers: [],
+        products: []
+      };
+      db.vendors.push(vendor);
+      db.bookings.forEach(b => { if (!b.vendorEmail) b.vendorEmail = vendor.email; });
+      db.session = { role: "vendor", email: vendor.email };
+      save();
+      setNav();
+      toast("Vendor registered successfully.");
+      page("vendor-dashboard");
+    });
+
+    $("login-form").addEventListener("submit", e => {
+      e.preventDefault();
+      resetErrors(e.currentTarget);
+      const email = $("login-email").value.trim();
+      const pass = $("login-password").value;
+      let ok = true;
+      ok = mark("login-email", !email ? "Email is required." : !emailPattern.test(email) ? "Enter a valid email address." : "") && ok;
+      ok = mark("login-password", !pass ? "Password is required." : "") && ok;
+      if (!ok) return;
+      const user = db.users.find(u => u.email === email && u.password === pass);
+      const vendor = db.vendors.find(v => v.email === email && v.password === pass);
+      if (!user && !vendor) {
+        $("login-form-error").textContent = "Invalid email or password.";
+        return;
+      }
+      db.session = user ? { role: "user", email } : { role: "vendor", email };
+      save();
+      setNav();
+      toast("Logged in as " + db.session.role + ".");
+      page(user ? "user-dashboard" : "vendor-dashboard");
+    });
+
+    $("dashboard-link").addEventListener("click", () => {
+      if (!db.session) return page("login");
+      page(db.session.role === "vendor" ? "vendor-dashboard" : "user-dashboard");
+    });
+    $("logout-btn").addEventListener("click", () => {
+      db.session = null;
+      save();
+      setNav();
+      toast("Logged out.");
+      page("home");
+    });
+
+    document.querySelectorAll(".tab").forEach(tab => tab.addEventListener("click", () => {
+      document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+      document.querySelectorAll(".dashboard-panel").forEach(p => p.classList.add("hidden"));
+      tab.classList.add("active");
+      $("panel-" + tab.dataset.panel).classList.remove("hidden");
+      renderVendorDashboard();
+    }));
+    document.querySelectorAll(".customer-tab").forEach(tab => tab.addEventListener("click", () => {
+      document.querySelectorAll(".customer-tab").forEach(t => t.classList.remove("active"));
+      document.querySelectorAll(".customer-panel").forEach(p => p.classList.add("hidden"));
+      tab.classList.add("active");
+      $("customer-panel-" + tab.dataset.customerPanel).classList.remove("hidden");
+      renderUserDashboard();
+    }));
+    $("customer-search").addEventListener("input", e => {
+      db.customerSearch = e.target.value;
+      save();
+      renderCustomerVendors();
+    });
+    $("customer-filter").addEventListener("change", e => {
+      db.customerFilter = e.target.value;
+      save();
+      renderCustomerVendors();
+    });
+    $("customer-location-filter").addEventListener("input", e => {
+      db.customerLocationFilter = e.target.value;
+      save();
+      renderCustomerVendors();
+    });
+    $("customer-price-filter").addEventListener("change", e => {
+      db.customerPriceFilter = e.target.value;
+      save();
+      renderCustomerVendors();
+    });
+    $("customer-rating-filter").addEventListener("change", e => {
+      db.customerRatingFilter = e.target.value;
+      save();
+      renderCustomerVendors();
+    });
+    $("customer-sort").addEventListener("change", e => {
+      db.customerSort = e.target.value;
+      save();
+      renderCustomerVendors();
+    });
+    $("veg-only-toggle").addEventListener("change", e => {
+      db.vegOnly = e.target.checked;
+      save();
+      renderCustomerProducts();
+    });
+    $("customer-place-order").addEventListener("click", openCheckoutModal);
+    $("user-place-order-top").addEventListener("click", openCheckoutModal);
+    $("checkout-cancel").addEventListener("click", closeCheckoutModal);
+    $("checkout-modal").addEventListener("click", e => { if (e.target === $("checkout-modal")) closeCheckoutModal(); });
+    $("checkout-phone").addEventListener("input", e => { e.target.value = e.target.value.replace(/\D/g, "").slice(0, 10); });
+    $("checkout-form").addEventListener("submit", e => {
+      e.preventDefault();
+      confirmCustomerOrder();
+    });
+    $("product-image-file").addEventListener("change", e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      if (!["image/png", "image/jpeg", "image/webp"].includes(file.type)) {
+        e.target.value = "";
+        return toast("Product picture must be PNG, JPG, or WEBP.", "error");
+      }
+      const reader = new FileReader();
+      reader.onload = () => {
+        e.target.dataset.image = reader.result;
+        toast("Product picture ready.");
+      };
+      reader.readAsDataURL(file);
+    });
+    $("profile-user-phone").addEventListener("input", e => { e.target.value = e.target.value.replace(/\D/g, "").slice(0, 10); });
+    $("profile-user-image-file").addEventListener("change", e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      if (!["image/png", "image/jpeg", "image/webp"].includes(file.type)) {
+        e.target.value = "";
+        return toast("Profile picture must be PNG, JPG, or WEBP.", "error");
+      }
+      const reader = new FileReader();
+      reader.onload = () => {
+        e.target.dataset.image = reader.result;
+        toast("Profile picture ready.");
+      };
+      reader.readAsDataURL(file);
+    });
+    $("user-profile-form").addEventListener("submit", e => {
+      e.preventDefault();
+      const user = currentAccount();
+      if (!user || user.role !== "user") return page("login");
+      const name = $("profile-user-name").value.trim();
+      const email = $("profile-user-email").value.trim();
+      const phone = $("profile-user-phone").value.trim();
+      if (!namePattern.test(name)) return toast("Use alphabets and spaces only for name.", "error");
+      if (!emailPattern.test(email)) return toast("Enter a valid email.", "error");
+      if (!phonePattern.test(phone)) return toast("Enter a valid 10-digit phone.", "error");
+      if (!uniqueEmail(email, user.email)) return toast("Email already exists.", "error");
+      if (!uniquePhone(phone, user.phone)) return toast("Phone already exists.", "error");
+      user.name = name;
+      user.email = email;
+      user.phone = phone;
+      user.address = $("profile-user-address").value.trim();
+      user.profileImage = $("profile-user-image").value.trim() || $("profile-user-image-file").dataset.image || user.profileImage || "";
+      db.session.email = email;
+      $("profile-user-image-file").value = "";
+      $("profile-user-image-file").dataset.image = "";
+      save();
+      toast("Profile updated.");
+      renderUserDashboard();
+    });
+    $("user-password-form").addEventListener("submit", e => {
+      e.preventDefault();
+      const user = currentAccount();
+      if (!user || user.role !== "user") return page("login");
+      const oldPassword = $("profile-old-password").value;
+      const newPassword = $("profile-new-password").value;
+      const confirmPassword = $("profile-confirm-password").value;
+      if (oldPassword !== user.password) return toast("Current password is incorrect.", "error");
+      if (!passwordPattern.test(newPassword)) return toast("New password must be strong.", "error");
+      if (newPassword !== confirmPassword) return toast("Confirm password must match.", "error");
+      user.password = newPassword;
+      $("profile-old-password").value = "";
+      $("profile-new-password").value = "";
+      $("profile-confirm-password").value = "";
+      save();
+      toast("Password changed.");
+    });
+    $("customer-message-form").addEventListener("submit", e => {
+      e.preventDefault();
+      const user = currentAccount();
+      if (!user || user.role !== "user") return page("login");
+      const vendorEmail = $("customer-message-vendor").value;
+      const text = $("customer-message-text").value.trim();
+      if (!vendorEmail || !text) return toast("Choose a vendor and enter a message.", "error");
+      db.messages.push({ id: "M" + Date.now(), vendorEmail, customerEmail: user.email, from: "customer", text, date: new Date().toLocaleString("en-IN") });
+      notify(vendorEmail, "New message from " + user.name + ".", "Message");
+      $("customer-message-text").value = "";
+      save();
+      toast("Message sent.");
+      renderUserDashboard();
+    });
+    $("customer-settings-form").addEventListener("submit", e => {
+      e.preventDefault();
+      const user = currentAccount();
+      if (!user || user.role !== "user") return page("login");
+      user.preferences = {
+        notifications: $("customer-pref-notifications").value,
+        language: $("customer-pref-language").value,
+        theme: $("customer-pref-theme").value,
+        privacy: $("customer-pref-privacy").value
+      };
+      save();
+      toast("Preferences saved.");
+      renderUserDashboard();
+    });
+    $("customer-support-form").addEventListener("submit", e => {
+      e.preventDefault();
+      const user = currentAccount();
+      if (!user || user.role !== "user") return page("login");
+      const subject = $("customer-support-subject").value.trim();
+      const message = $("customer-support-message").value.trim();
+      if (!subject || !message) return toast("Support subject and message are required.", "error");
+      db.supportTickets.push({ id: "T" + Date.now(), customerEmail: user.email, subject, message, status: "Open", date: new Date().toLocaleString("en-IN") });
+      $("customer-support-subject").value = "";
+      $("customer-support-message").value = "";
+      save();
+      toast("Support ticket submitted.");
+      renderUserDashboard();
+    });
+    $("message-form").addEventListener("submit", e => {
+      e.preventDefault();
+      const vendor = currentAccount();
+      if (!vendor || vendor.role !== "vendor") return page("login");
+      const customerEmail = $("message-customer").value;
+      const text = $("message-text").value.trim();
+      if (!customerEmail || !text) return toast("Choose a customer and enter a message.", "error");
+      db.messages.push({ id: "M" + Date.now(), vendorEmail: vendor.email, customerEmail, from: "vendor", text, date: new Date().toLocaleString("en-IN") });
+      if ($("auto-reply").value === "on") db.messages.push({ id: "M" + (Date.now() + 1), vendorEmail: vendor.email, customerEmail, from: "system", text: "Auto-reply is active. We are preparing your order and will update you soon.", date: new Date().toLocaleString("en-IN") });
+      notifyCustomer(customerEmail, "New message from " + vendor.businessName + ".", "Message");
+      $("message-text").value = "";
+      notify(vendor.email, "Message sent to customer.", "Message");
+      save();
+      toast("Message sent.");
+      renderVendorDashboard();
+    });
+    $("settings-form").addEventListener("submit", e => {
+      e.preventDefault();
+      const vendor = currentAccount();
+      if (!vendor || vendor.role !== "vendor") return page("login");
+      vendor.settings = {
+        logo: $("settings-logo").value.trim(),
+        banner: $("settings-banner").value.trim(),
+        hours: $("settings-hours").value.trim(),
+        days: $("settings-days").value.trim(),
+        location: $("settings-location").value.trim(),
+        serviceArea: $("settings-service-area").value.trim(),
+        slots: $("settings-slots").value.trim(),
+        availability: $("settings-availability").value
+      };
+      const newPassword = $("settings-password").value;
+      if (newPassword) {
+        if (!passwordPattern.test(newPassword)) return toast("New password must follow the strong password rule.", "error");
+        vendor.password = newPassword;
+        $("settings-password").value = "";
+      }
+      save();
+      toast("Business settings updated.");
+      renderVendorDashboard();
+    });
+    $("offer-form").addEventListener("submit", e => {
+      e.preventDefault();
+      const vendor = currentAccount();
+      if (!vendor || vendor.role !== "vendor") return page("login");
+      const code = $("offer-code").value.trim().toUpperCase();
+      const discount = Number($("offer-discount").value);
+      if (!code || !discount || discount < 1 || discount > 90) return toast("Enter a valid coupon code and discount from 1 to 90%.", "error");
+      vendor.offers = vendor.offers || [];
+      vendor.offers.push({ id: "O" + Date.now(), code, discount, desc: $("offer-desc").value.trim(), active: true });
+      $("offer-code").value = "";
+      $("offer-discount").value = "";
+      $("offer-desc").value = "";
+      notify(vendor.email, "Offer " + code + " is now active.", "Offer");
+      save();
+      toast("Offer created.");
+      renderVendorDashboard();
+    });
+    $("support-form").addEventListener("submit", e => {
+      e.preventDefault();
+      const vendor = currentAccount();
+      if (!vendor || vendor.role !== "vendor") return page("login");
+      const subject = $("support-subject").value.trim();
+      const message = $("support-message").value.trim();
+      if (!subject || !message) return toast("Support subject and message are required.", "error");
+      db.supportTickets.push({ id: "T" + Date.now(), vendorEmail: vendor.email, subject, message, status: "Open", date: new Date().toLocaleString("en-IN") });
+      $("support-subject").value = "";
+      $("support-message").value = "";
+      save();
+      toast("Support ticket submitted.");
+      renderVendorDashboard();
+    });
+    $("withdraw-btn").addEventListener("click", () => {
+      const vendor = currentAccount();
+      const amount = vendorOrders(vendor.email).filter(o => o.paymentStatus === "Paid").reduce((sum, o) => sum + Number(o.total || 0), 0);
+      if (!amount) return toast("No paid balance available for withdrawal.", "warn");
+      notify(vendor.email, "Withdrawal request submitted for ₹" + amount.toLocaleString("en-IN") + ".", "Payment");
+      save();
+      toast("Withdrawal request submitted.");
+      renderVendorDashboard();
+    });
+    $("download-invoice-btn").addEventListener("click", () => {
+      const vendor = currentAccount();
+      const rows = vendorOrders(vendor.email).map(o => [o.id, o.customerName, o.total, o.paymentMethod, o.paymentStatus, o.date].join(","));
+      const csv = "Order,Customer,Total,Method,Status,Date\n" + rows.join("\n");
+      const blob = new Blob([csv], { type: "text/csv" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "quickbite-receipts.csv";
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    function renderUserDashboard() {
+      const user = currentAccount();
+      if (!user || user.role !== "user") return page("login");
+      ensureCustomerState(user);
+      $("user-welcome").textContent = "Welcome, " + user.name + ". Browse vendors, add food to cart, place orders, and track them here.";
+      $("user-profile").innerHTML = `${user.profileImage ? `<img class="product-photo-sm" src="${escapeHTML(user.profileImage)}" alt="${escapeHTML(user.name)}" />` : ""}<p>${escapeHTML(user.email)} • ${escapeHTML(user.phone)}${user.address ? " • " + escapeHTML(user.address) : ""}</p>`;
+      $("user-cart-count").textContent = user.cart.reduce((sum, item) => sum + item.qty, 0) + " items";
+      $("user-order-count").textContent = user.orders.length + " orders";
+      $("profile-user-name").value = user.name || "";
+      $("profile-user-email").value = user.email || "";
+      $("profile-user-phone").value = user.phone || "";
+      $("profile-user-address").value = user.address || "";
+      $("profile-user-image").value = user.profileImage || "";
+      $("customer-search").value = db.customerSearch;
+      $("customer-filter").value = db.customerFilter;
+      $("customer-location-filter").value = db.customerLocationFilter;
+      $("customer-price-filter").value = db.customerPriceFilter;
+      $("customer-rating-filter").value = db.customerRatingFilter;
+      $("customer-sort").value = db.customerSort;
+      $("veg-only-toggle").checked = db.vegOnly;
+      $("customer-pref-notifications").value = user.preferences.notifications || "Enabled";
+      $("customer-pref-language").value = user.preferences.language || "English";
+      $("customer-pref-theme").value = user.preferences.theme || "Light";
+      $("customer-pref-privacy").value = user.preferences.privacy || "Standard";
+      syncVendorsFromAPI().then(() => renderCustomerVendors());
+      renderCustomerCart();
+      renderCustomerOrders();
+      renderCustomerWishlist();
+      renderCustomerNotifications();
+      renderCustomerMessages();
+      renderCustomerSupport();
+    }
+    async function syncVendorsFromAPI() {
+  try {
+    const [vendors, services] = await Promise.all([
+      apiRequest("/services/vendors"),
+      apiRequest("/services")
+    ]);
+    if (vendors && Array.isArray(vendors)) {
+      vendors.forEach(v => {
+        const exists = db.vendors.find(x => x.email === v.email);
+        const vendorServices = Array.isArray(services) ? services.filter(s => (s.vendor?._id || s.vendorId) === v._id) : [];
+        const products = vendorServices.map(s => ({
+          id: s._id,
+          name: s.title,
+          price: s.price,
+          desc: s.description,
+          image: s.images?.[0] || s.image || "",
+          category: s.category,
+          tags: (s.tags || []).join(", "),
+          foodType: "veg",
+          available: true
+        }));
+        if (!exists) {
+          db.vendors.push({
+            businessName: v.businessName,
+            email: v.email,
+            category: v.serviceCategory,
+            businessAddress: v.businessAddress || "",
+            ownerName: v.ownerName || "",
+            products,
+            settings: { location: v.location, serviceArea: v.serviceArea, availability: "Open" }
+          });
+        } else {
+          exists.products = products;
+        }
+      });
+      save();
+    }
+  } catch(e) { console.log("Vendor sync failed", e); }
+}
+    function renderCustomerVendors() {
+      const q = db.customerSearch.toLowerCase();
+      const filter = db.customerFilter;
+      const locationQ = db.customerLocationFilter.toLowerCase();
+      const [minPrice, maxPrice] = parsePriceRange(db.customerPriceFilter);
+      const minRating = Number(db.customerRatingFilter || 0);
+      const vendors = shopVendors().filter(v => {
+        const productPrices = v.products.map(p => Number(p.price || 0)).filter(price => Number.isFinite(price));
+        const lowestPrice = productPrices.length ? Math.min(...productPrices) : 0;
+        const serviceText = v.products.map(p => [p.name, p.category, p.tags, p.desc].join(" ")).join(" ").toLowerCase();
+        const matchesSearch = !q || v.name.toLowerCase().includes(q) || v.category.toLowerCase().includes(q) || serviceText.includes(q) || (v.location || "").toLowerCase().includes(q);
+        const matchesFilter = filter === "all" || (v.category || "").toLowerCase() === filter.toLowerCase();
+        
+        const matchesLocation = !locationQ || (v.location || "").toLowerCase().includes(locationQ) || (v.serviceArea || "").toLowerCase().includes(locationQ) || (v.businessAddress || "").toLowerCase().includes(locationQ);
+        const matchesPrice = db.customerPriceFilter === "all" || (productPrices.length > 0 && lowestPrice >= minPrice && lowestPrice <= maxPrice);
+        const matchesRating = Number(v.rating || 0) >= minRating;
+        return matchesSearch && matchesFilter && matchesLocation && matchesPrice && matchesRating;
+      }).sort((a, b) => {
+        if (db.customerSort === "price") {
+          const aPrice = a.products.length ? Math.min(...a.products.map(p => Number(p.price || 0)).filter(price => Number.isFinite(price))) : 0;
+          const bPrice = b.products.length ? Math.min(...b.products.map(p => Number(p.price || 0)).filter(price => Number.isFinite(price))) : 0;
+          return aPrice - bPrice;
+        }
+        if (db.customerSort === "popularity") return b.products.length - a.products.length;
+        return Number(b.rating || 0) - Number(a.rating || 0);
+      });
+      $("customer-vendor-list").innerHTML = vendors.length ? vendors.map(v => `
+        <article class="card vendor-shop-card">
+          <div class="vendor-avatar">${v.icon}</div>
+          <div>
+            <h3>${escapeHTML(v.name)}</h3>
+            <p class="muted">${escapeHTML(v.category)} • ${escapeHTML(v.location || "Local area")} • ${v.deliveryTime} • ₹${v.deliveryFee} delivery</p>
+            <p class="muted">⭐ ${Number(v.rating || 0).toFixed(1)} • ${v.products.length} items • ${escapeHTML(v.availability || "Open")}</p>
+          </div>
+          <div class="actions"><button class="btn" data-favorite-vendor="${v.id}">Save</button><button class="btn ${db.selectedVendorId === v.id ? "btn-primary" : ""}" data-shop-vendor="${v.id}">View Menu</button></div>
+        </article>`).join("") : "<div class='card'><p class='muted'>No vendors found. Try a different search or category.</p></div>";
+      document.querySelectorAll("[data-shop-vendor]").forEach(btn => btn.addEventListener("click", () => {
+        db.selectedVendorId = btn.dataset.shopVendor;
+        if (db.selectedVendorId.startsWith("vendor-")) {
+          const vendorEmail = db.selectedVendorId.replace("vendor-", "");
+          const realVendor = db.vendors.find(v => v.email === vendorEmail);
+          if (realVendor) realVendor.products.forEach(product => { product.views = (product.views || 0) + 1; });
+        }
+        save();
+        renderCustomerVendors();
+        renderCustomerProducts();
+        $("customer-menu-card").scrollIntoView({ behavior: "smooth", block: "start" });
+      }));
+      document.querySelectorAll("[data-favorite-vendor]").forEach(btn => btn.addEventListener("click", () => toggleFavoriteVendor(btn.dataset.favoriteVendor)));
+      renderCustomerProducts();
+    }
+
+    function renderCustomerProducts() {
+      const vendor = selectedShopVendor();
+      if (!vendor) {
+        $("customer-menu-card").classList.add("hidden");
+        return;
+      }
+      $("customer-menu-card").classList.remove("hidden");
+      $("customer-menu-title").textContent = vendor.name + " Menu";
+      $("customer-menu-subtitle").textContent = vendor.category + " • " + vendor.deliveryTime;
+      $("customer-vendor-detail").innerHTML = `
+        <div class="list-item"><div><strong>Business Info</strong><p class="muted">${escapeHTML(vendor.businessInfo || vendor.category)} • ${escapeHTML(vendor.location || "Local area")} • ${escapeHTML(vendor.serviceArea || "Nearby")}</p></div><span class="badge ${vendor.availability === "Closed" ? "red" : "green"}">${escapeHTML(vendor.availability || "Open")}</span></div>
+        <div class="list-item"><div><strong>Ratings & Reviews</strong><p class="muted">⭐ ${Number(vendor.rating || 0).toFixed(1)} • ${vendor.products.length} listed services/products</p></div></div>`;
+      $("favorite-vendor-btn").textContent = isFavorite(vendor.id) ? "Saved" : "Save Vendor";
+      $("favorite-vendor-btn").onclick = () => toggleFavoriteVendor(vendor.id);
+      const visibleProducts = db.vegOnly ? vendor.products.filter(p => productFoodType(p) === "veg") : vendor.products;
+      $("customer-product-list").innerHTML = visibleProducts.length ? visibleProducts.map(p => `
+        <article class="card menu-card">
+          ${p.image ? `<img class="product-photo" src="${escapeHTML(p.image)}" alt="${escapeHTML(p.name)}" />` : `<div class="menu-emoji">${p.emoji}</div>`}
+          <h3>${escapeHTML(p.name)}</h3>
+          <p><span class="badge ${productFoodType(p) === "veg" ? "green" : "red"}">${productFoodType(p) === "veg" ? "Veg" : "Non-Veg"}</span></p>
+          <p class="muted">${escapeHTML(p.desc)}</p>
+          <div class="price">₹${Number(p.price).toLocaleString("en-IN")}</div>
+          <p class="muted">${escapeHTML(p.category || vendor.category)} ${p.tags ? "• " + escapeHTML(p.tags) : ""}</p>
+          <button class="btn btn-primary btn-block" data-add-cart="${vendor.id}:${p.id}">Add to Cart</button>
+          <button class="btn btn-block" data-favorite-service="${vendor.id}:${p.id}">Save Service</button>
+        </article>`).join("") : "<p class='muted'>No products match the selected filter.</p>";
+      document.querySelectorAll("[data-add-cart]").forEach(btn => btn.addEventListener("click", () => {
+        const [vendorId, productId] = btn.dataset.addCart.split(":");
+        addCustomerCartItem(vendorId, productId);
+      }));
+      document.querySelectorAll("[data-favorite-service]").forEach(btn => btn.addEventListener("click", () => {
+        const [vendorId, productId] = btn.dataset.favoriteService.split(":");
+        toggleFavoriteVendor(vendorId, productId);
+      }));
+    }
+
+    function isFavorite(vendorId, productId = "") {
+      const user = currentAccount();
+      if (!user || user.role !== "user") return false;
+      ensureCustomerState(user);
+      return user.wishlist.some(item => item.vendorId === vendorId && (item.productId || "") === productId);
+    }
+
+    function toggleFavoriteVendor(vendorId, productId = "") {
+      const user = currentAccount();
+      if (!user || user.role !== "user") return page("login");
+      ensureCustomerState(user);
+      const vendor = shopVendors().find(v => v.id === vendorId);
+      const product = vendor && productId ? vendor.products.find(p => p.id === productId) : null;
+      if (!vendor) return;
+      const exists = user.wishlist.find(item => item.vendorId === vendorId && (item.productId || "") === productId);
+      if (exists) {
+        user.wishlist = user.wishlist.filter(item => !(item.vendorId === vendorId && (item.productId || "") === productId));
+        toast("Removed from wishlist.");
+      } else {
+        user.wishlist.push({ vendorId, productId, vendorName: vendor.name, productName: product ? product.name : "", category: vendor.category, price: product ? product.price : "" });
+        toast("Saved to wishlist.");
+      }
+      save();
+      renderUserDashboard();
+    }
+
+    function addCustomerCartItem(vendorId, productId) {
+      const user = currentAccount();
+      ensureCustomerState(user);
+      const vendor = shopVendors().find(v => v.id === vendorId);
+      const product = vendor && vendor.products.find(p => p.id === productId);
+      if (!vendor || !product) return;
+      const mixedVendor = user.cart.find(item => item.vendorId !== vendorId);
+      if (mixedVendor) return toast("Clear your cart first. Items from different vendors cannot be mixed.", "warn");
+      const existing = user.cart.find(item => item.productId === productId);
+      if (existing) existing.qty++;
+      else {
+        user.cart.push({
+          vendorId,
+          vendorEmail: vendor.email || "",
+          vendorName: vendor.name,
+          deliveryFee: vendor.deliveryFee,
+          productId,
+          name: product.name,
+          price: Number(product.price),
+          emoji: product.emoji,
+          image: product.image || "",
+          foodType: productFoodType(product),
+          qty: 1
+        });
+      }
+      save();
+      toast(product.name + " added to cart.");
+      renderCustomerCart();
+      renderUserDashboard();
+    }
+
+    function renderCustomerCart() {
+      const user = currentAccount();
+      if (!user || user.role !== "user") return;
+      ensureCustomerState(user);
+      const subtotal = user.cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+      const delivery = user.cart.length ? user.cart[0].deliveryFee : 0;
+      const tax = Math.round(subtotal * 0.05);
+      const total = subtotal + delivery + tax;
+      $("cart-vendor-note").textContent = user.cart.length ? "Ordering from " + user.cart[0].vendorName + "." : "Add items from a vendor to begin.";
+      $("customer-cart-list").innerHTML = user.cart.length ? user.cart.map(item => `
+        <div class="cart-line">
+          <div>
+            ${item.image ? `<img class="product-photo-sm" src="${escapeHTML(item.image)}" alt="${escapeHTML(item.name)}" />` : ""}
+            <strong>${item.image ? "" : item.emoji + " "}${escapeHTML(item.name)}</strong>
+            <p class="muted">₹${item.price.toLocaleString("en-IN")} • ${escapeHTML(item.vendorName)}</p>
+          </div>
+          <div class="qty-controls">
+            <button class="btn qty-btn" data-cart-dec="${item.productId}">-</button>
+            <span>${item.qty}</span>
+            <button class="btn qty-btn" data-cart-inc="${item.productId}">+</button>
+          </div>
+        </div>`).join("") : "<p class='muted'>Your cart is empty.</p>";
+      $("customer-cart-subtotal").textContent = "₹" + subtotal.toLocaleString("en-IN");
+      $("customer-cart-delivery").textContent = "₹" + delivery.toLocaleString("en-IN");
+      $("customer-cart-tax").textContent = "₹" + tax.toLocaleString("en-IN");
+      $("customer-cart-total").textContent = "₹" + total.toLocaleString("en-IN");
+      document.querySelectorAll("[data-cart-inc]").forEach(btn => btn.addEventListener("click", () => updateCartQty(btn.dataset.cartInc, 1)));
+      document.querySelectorAll("[data-cart-dec]").forEach(btn => btn.addEventListener("click", () => updateCartQty(btn.dataset.cartDec, -1)));
+    }
+
+    function updateCartQty(productId, delta) {
+      const user = currentAccount();
+      ensureCustomerState(user);
+      const item = user.cart.find(i => i.productId === productId);
+      if (!item) return;
+      item.qty += delta;
+      if (item.qty <= 0) user.cart = user.cart.filter(i => i.productId !== productId);
+      save();
+      renderCustomerCart();
+      renderUserDashboard();
+    }
+
+    function openCheckoutModal() {
+      const user = currentAccount();
+      if (!user || user.role !== "user") return page("login");
+      ensureCustomerState(user);
+      if (!user.cart.length) return toast("Your cart is empty.", "warn");
+      $("checkout-name").value = user.name || "";
+      $("checkout-phone").value = user.phone || "";
+      $("checkout-address").value = user.address || "";
+      $("checkout-landmark").value = "";
+      $("checkout-request").value = "";
+      $("checkout-date").value = "";
+      $("checkout-time").value = "";
+      $("checkout-modal").classList.add("open");
+      $("checkout-modal").setAttribute("aria-hidden", "false");
+    }
+
+    function closeCheckoutModal() {
+      $("checkout-modal").classList.remove("open");
+      $("checkout-modal").setAttribute("aria-hidden", "true");
+      resetErrors($("checkout-form"));
+    }
+
+    async function confirmCustomerOrder() {
+      const user = currentAccount();
+      if (!user || user.role !== "user") return page("login");
+      ensureCustomerState(user);
+      if (!user.cart.length) return toast("Your cart is empty.", "warn");
+      let ok = true;
+      ok = mark("checkout-name", !$("checkout-name").value.trim() ? "Receiver name is required." : "") && ok;
+      ok = mark("checkout-phone", !phonePattern.test($("checkout-phone").value.trim()) ? "Enter a valid 10-digit phone number." : "") && ok;
+      ok = mark("checkout-address", $("checkout-address").value.trim().length < 8 ? "Enter a complete delivery address." : "") && ok;
+      if (!ok) return;
+
+      const submitButton = $("checkout-form").querySelector('button[type="submit"]');
+      const originalLabel = submitButton.textContent;
+      submitButton.disabled = true;
+      submitButton.textContent = "Processing...";
+
+      try {
+        const subtotal = user.cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+        const delivery = user.cart[0].deliveryFee;
+        const tax = Math.round(subtotal * 0.05);
+        const paymentMethod = document.querySelector('input[name="payment-method"]:checked').value;
+        const frontendOrderId = "Q" + Date.now().toString().slice(-6);
+        const deliveryDetails = {
+          name: $("checkout-name").value.trim(),
+          phone: $("checkout-phone").value.trim(),
+          address: $("checkout-address").value.trim(),
+          landmark: $("checkout-landmark").value.trim(),
+          slot: $("checkout-slot").value,
+          date: $("checkout-date").value,
+          time: $("checkout-time").value,
+          specialRequest: $("checkout-request").value.trim()
+        };
+        const order = {
+          id: frontendOrderId,
+          vendorName: user.cart[0].vendorName,
+          vendorEmail: user.cart[0].vendorEmail,
+          items: user.cart.map(item => ({ ...item })),
+          subtotal,
+          delivery,
+          tax,
+          total: subtotal + delivery + tax,
+          status: "Pending",
+          paymentMethod,
+          paymentStatus: paymentMethod === "Cash on Delivery" ? "Pending" : "Created",
+          deliveryDetails,
+          date: new Date().toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" }),
+          createdAtTs: Date.now()
+        };
+
+        if (paymentMethod === "Cash on Delivery") {
+          const transaction = createTransactionDetails(paymentMethod, order.total);
+          order.paymentStatus = transaction.status;
+          order.transaction = transaction;
+        } else {
+          const paymentSetup = await apiRequest("/payments/orders", {
+            method: "POST",
+            body: JSON.stringify({
+              frontendOrderId: order.id,
+              customerName: deliveryDetails.name,
+              customerEmail: user.email,
+              customerPhone: deliveryDetails.phone,
+              customerAddress: deliveryDetails.address,
+              vendorName: order.vendorName,
+              vendorEmail: order.vendorEmail || "",
+              items: order.items,
+              subtotal: order.subtotal,
+              delivery: order.delivery,
+              tax: order.tax,
+              total: order.total,
+              paymentMethod,
+              landmark: deliveryDetails.landmark,
+              slot: deliveryDetails.slot,
+              date: deliveryDetails.date,
+              time: deliveryDetails.time,
+              specialRequest: deliveryDetails.specialRequest
+            })
+          });
+
+          const razorpayResponse = await openRazorpayCheckout({
+            keyId: paymentSetup.keyId,
+            amount: paymentSetup.razorpayOrder.amount,
+            currency: paymentSetup.razorpayOrder.currency,
+            orderId: paymentSetup.razorpayOrder.id,
+            method: paymentMethod,
+            customerName: deliveryDetails.name,
+            customerEmail: user.email,
+            customerPhone: deliveryDetails.phone,
+            frontendOrderId: order.id,
+            vendorName: order.vendorName
+          });
+
+          const verifiedPayment = await apiRequest("/payments/verify", {
+            method: "POST",
+            body: JSON.stringify({
+              paymentRecordId: paymentSetup.paymentRecordId,
+              ...razorpayResponse
+            })
+          });
+
+          order.persistedOrderId = verifiedPayment.orderId;
+          order.status = verifiedPayment.status;
+          order.paymentStatus = verifiedPayment.paymentStatus;
+          order.transaction = {
+            id: verifiedPayment.transaction.id,
+            method: verifiedPayment.transaction.method,
+            status: verifiedPayment.transaction.status,
+            amount: verifiedPayment.transaction.amount,
+            fee: transactionFee(paymentMethod, order.total),
+            date: new Date(verifiedPayment.transaction.date).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })
+          };
+        }
+
+        user.orders.push(order);
+        notifyCustomer(user.email, "Order " + order.id + " has been placed.", "Booking confirmation");
+        if (order.vendorEmail) {
+          db.bookings.push({
+            id: order.id,
+            persistedOrderId: order.persistedOrderId || "",
+            vendorEmail: order.vendorEmail,
+            customer: user.name,
+            service: order.items.map(item => item.name + " x" + item.qty).join(", "),
+            amount: order.total,
+            paymentMethod: order.paymentMethod,
+            paymentStatus: order.paymentStatus,
+            transactionId: order.transaction && order.transaction.id ? order.transaction.id : "",
+            slot: [order.deliveryDetails.slot, order.deliveryDetails.date, order.deliveryDetails.time].filter(Boolean).join(" • "),
+            status: order.status
+          });
+          notify(order.vendorEmail, "New order " + order.id + " from " + user.name + ".", "New booking");
+        } else {
+          scheduleOrderProgress(user.email, order.id);
+        }
+        user.cart = [];
+        save();
+        closeCheckoutModal();
+        toast(paymentMethod === "Cash on Delivery" ? "Order placed successfully." : "Payment successful and order placed.");
+        document.querySelector('[data-customer-panel="orders"]').click();
+        renderUserDashboard();
+      } catch (error) {
+        toast(error.message || "Unable to complete checkout.", "error");
+      } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = originalLabel;
+      }
+    }
+
+    function renderCustomerOrders() {
+      const user = currentAccount();
+      if (!user || user.role !== "user") return;
+      ensureCustomerState(user);
+      const stages = ["Pending", "Accepted", "Out for Delivery", "Delivered"];
+      $("customer-orders-list").innerHTML = user.orders.length ? [...user.orders].reverse().map(order => {
+        const idx = Math.max(0, stages.indexOf(order.status));
+        const tracker = ["Rejected", "Cancelled"].includes(order.status)
+          ? `<span class='tracker-pill active'>${escapeHTML(order.status)}</span>`
+          : stages.map((stage, i) => `<span class="tracker-pill ${i < idx ? "done" : i === idx ? "active" : ""}">${stage}</span>`).join("");
+        return `
+          <article class="list-item">
+            <div>
+              <strong>Order #${order.id} • ${escapeHTML(order.vendorName)}</strong>
+              <p class="muted">${order.date} • ${order.items.map(item => (item.image ? "" : item.emoji + " ") + escapeHTML(item.name) + " x" + item.qty).join(" • ")}</p>
+              <p class="muted">Payment: ${escapeHTML(order.paymentMethod || "UPI")} • ${escapeHTML(order.paymentStatus || "Paid")}</p>
+              ${order.transaction ? `<p class="muted">Transaction: ${escapeHTML(order.transaction.id)} • Fee ₹${Number(order.transaction.fee || 0).toLocaleString("en-IN")} • ${escapeHTML(order.transaction.date)}</p>` : ""}
+              ${order.deliveryDetails ? `<p class="muted">Deliver to: ${escapeHTML(order.deliveryDetails.name)}, ${escapeHTML(order.deliveryDetails.phone)} • ${escapeHTML(order.deliveryDetails.address)}${order.deliveryDetails.date || order.deliveryDetails.time ? " • Slot: " + escapeHTML([order.deliveryDetails.date, order.deliveryDetails.time].filter(Boolean).join(" ")) : ""}${order.deliveryDetails.specialRequest ? " • Request: " + escapeHTML(order.deliveryDetails.specialRequest) : ""}</p>` : ""}
+              ${order.deliveryPartner ? `<p class="badge green">Picked by ${escapeHTML(order.deliveryPartner.name)} • ${escapeHTML(order.deliveryPartner.phone)} • ${order.deliveryPartner.rating} ★</p>` : ""}
+              <div class="order-tracker">${tracker}</div>
+              ${!["Delivered", "Rejected", "Cancelled"].includes(order.status) ? `<button class="btn btn-danger" style="margin-top:10px" data-cancel-order="${order.id}">Cancel Order</button>` : ""}
+              ${order.cancellation ? `<p class="muted">Cancellation: ${escapeHTML(order.cancellation.reason)} • Fee ₹${order.cancellation.fee.toLocaleString("en-IN")} • Refund ₹${order.cancellation.refund.toLocaleString("en-IN")}</p>` : ""}
+              ${order.status === "Delivered" ? `<div class="rating-note">Rate products: ${order.items.map(item => `
+                <div style="margin-top:8px">
+                  <strong>${escapeHTML(item.name)}</strong>
+                  <span class="stars">${[1,2,3,4,5].map(n => `<button class="btn star-choice ${item.rating === n ? "active" : ""}" data-rate-item="${order.id}:${item.productId}:${n}">${n}★</button>`).join("")}</span>
+                </div>`).join("")}</div>` : ""}
+            </div>
+            <div class="actions"><strong>₹${order.total.toLocaleString("en-IN")}</strong></div>
+          </article>`;
+      }).join("") : "<p class='muted'>No orders yet. Add items to your cart and place an order.</p>";
+      document.querySelectorAll("[data-rate-item]").forEach(btn => btn.addEventListener("click", () => {
+        const [orderId, productId, rating] = btn.dataset.rateItem.split(":");
+        rateOrderItem(orderId, productId, Number(rating));
+      }));
+      document.querySelectorAll("[data-cancel-order]").forEach(btn => btn.addEventListener("click", () => cancelCustomerOrder(btn.dataset.cancelOrder)));
+    }
+
+    async function cancelCustomerOrder(orderId) {
+      const user = currentAccount();
+      if (!user || user.role !== "user") return;
+      ensureCustomerState(user);
+      const order = user.orders.find(item => item.id === orderId);
+      if (!order) return;
+      if (["Delivered", "Completed"].includes(order.status)) return toast("Delivered orders cannot be cancelled.", "error");
+
+      try {
+        let breakdown;
+        if (order.persistedOrderId) {
+          const cancelled = await apiRequest(`/orders/${order.persistedOrderId}/cancel`, { method: "POST", body: JSON.stringify({ customerEmail: user.email }) });
+          order.status = cancelled.status;
+          order.paymentStatus = cancelled.paymentStatus;
+          breakdown = normalizeCancellation(cancelled.cancellation || {});
+        } else {
+          breakdown = cancellationBreakdown(order);
+          order.status = "Cancelled";
+          order.paymentStatus = breakdown.refund > 0 ? "Partially Refunded" : "Refunded";
+        }
+
+        order.cancellation = breakdown;
+        const booking = db.bookings.find(item => item.id === orderId);
+        if (booking) {
+          booking.status = "Cancelled";
+          booking.paymentStatus = order.paymentStatus;
+          booking.cancellation = breakdown;
+        }
+        notifyCustomer(user.email, `Order ${order.id} cancelled. Refund ₹${Number(breakdown.refund || 0).toLocaleString("en-IN")} after fee ₹${Number(breakdown.fee || 0).toLocaleString("en-IN")}.`, "Cancellation");
+        if (order.vendorEmail) {
+          notify(order.vendorEmail, `Order ${order.id} cancelled by ${user.name}.`, "Cancellation");
+        }
+        save();
+        toast(`Order cancelled. Refund ₹${Number(breakdown.refund || 0).toLocaleString("en-IN")}.`);
+        renderUserDashboard();
+      } catch (error) {
+        toast(error.message || "Unable to cancel this order.", "error");
+      }
+    }
+
+    function renderCustomerWishlist() {
+      const user = currentAccount();
+      if (!user || user.role !== "user") return;
+      ensureCustomerState(user);
+      $("customer-wishlist-list").innerHTML = user.wishlist.length ? user.wishlist.map(item => `
+        <div class="list-item">
+          <div><strong>${escapeHTML(item.productName || item.vendorName)}</strong><p class="muted">${escapeHTML(item.vendorName)} • ${escapeHTML(item.category)}${item.price ? " • ₹" + Number(item.price).toLocaleString("en-IN") : ""}</p></div>
+          <div class="actions"><button class="btn btn-primary" data-wishlist-open="${item.vendorId}">Open Menu</button><button class="btn btn-danger" data-wishlist-remove="${item.vendorId}:${item.productId || ""}">Remove</button></div>
+        </div>`).join("") : "<p class='muted'>No saved vendors or services yet.</p>";
+      document.querySelectorAll("[data-wishlist-open]").forEach(btn => btn.addEventListener("click", () => {
+        db.selectedVendorId = btn.dataset.wishlistOpen;
+        save();
+        document.querySelector('[data-customer-panel="browse"]').click();
+        $("customer-menu-card").scrollIntoView({ behavior: "smooth", block: "start" });
+      }));
+      document.querySelectorAll("[data-wishlist-remove]").forEach(btn => btn.addEventListener("click", () => {
+        const [vendorId, productId] = btn.dataset.wishlistRemove.split(":");
+        user.wishlist = user.wishlist.filter(item => !(item.vendorId === vendorId && (item.productId || "") === productId));
+        save();
+        renderUserDashboard();
+      }));
+    }
+
+    function renderCustomerNotifications() {
+      const user = currentAccount();
+      if (!user || user.role !== "user") return;
+      ensureCustomerState(user);
+      const vendorOffers = db.vendors.flatMap(v => (v.offers || []).filter(o => o.active).map(o => ({ type: "Offer", message: v.businessName + ": " + o.code + " gives " + o.discount + "% off", date: "Active now" })));
+      const alerts = [...user.notifications, ...vendorOffers].reverse();
+      $("customer-notification-list").innerHTML = alerts.length ? alerts.map(alert => `<div class="list-item"><div><strong>${escapeHTML(alert.type)}</strong><p class="muted">${escapeHTML(alert.message)}</p><p class="muted">${escapeHTML(alert.date)}</p></div></div>`).join("") : "<p class='muted'>No notifications yet.</p>";
+    }
+
+    function renderCustomerMessages() {
+      const user = currentAccount();
+      if (!user || user.role !== "user") return;
+      const vendors = shopVendors().filter(v => v.email);
+      $("customer-message-vendor").innerHTML = vendors.length ? vendors.map(v => `<option value="${escapeHTML(v.email)}">${escapeHTML(v.name)}</option>`).join("") : "<option value=''>No registered vendors yet</option>";
+      const messages = db.messages.filter(m => m.customerEmail === user.email);
+      $("customer-message-list").innerHTML = messages.length ? messages.slice().reverse().map(m => {
+        const vendor = db.vendors.find(v => v.email === m.vendorEmail);
+        return `<div class="list-item"><div><strong>${escapeHTML(m.from)} ${vendor ? "• " + escapeHTML(vendor.businessName) : ""}</strong><p class="muted">${escapeHTML(m.text)}</p><p class="muted">${escapeHTML(m.date)}</p></div></div>`;
+      }).join("") : "<p class='muted'>No messages yet. Ask a vendor about availability or booking details.</p>";
+    }
+
+    function renderCustomerSupport() {
+      const user = currentAccount();
+      if (!user || user.role !== "user") return;
+      const tickets = db.supportTickets.filter(ticket => ticket.customerEmail === user.email);
+      $("customer-support-list").innerHTML = tickets.length ? tickets.slice().reverse().map(ticket => `<div class="list-item"><div><strong>${escapeHTML(ticket.subject)}</strong><p class="muted">${escapeHTML(ticket.message)}</p><p class="muted">${escapeHTML(ticket.status)} • ${escapeHTML(ticket.date)}</p></div></div>`).join("") : "<p class='muted'>No support tickets yet.</p>";
+    }
+
+    function scheduleOrderProgress(userEmail, orderId) {
+      ["Accepted", "Out for Delivery", "Delivered"].forEach((status, index) => {
+        setTimeout(() => {
+          const user = db.users.find(u => u.email === userEmail);
+          const order = user && user.orders.find(o => o.id === orderId);
+          if (!order || ["Rejected", "Cancelled", "Delivered"].includes(order.status)) return;
+          order.status = status;
+          if (status === "Out for Delivery" && !order.deliveryPartner) {
+            order.deliveryPartner = DELIVERY_PARTNERS[Math.floor(Math.random() * DELIVERY_PARTNERS.length)];
+          }
+          if (status === "Delivered" && order.paymentMethod === "Cash on Delivery") order.paymentStatus = "Paid";
+          const booking = db.bookings.find(b => b.id === orderId);
+          if (booking) {
+            booking.status = status;
+            booking.paymentStatus = order.paymentStatus;
+          }
+          notifyCustomer(userEmail, "Order " + orderId + " status updated to " + status + ".", "Status update");
+          save();
+          if (db.session && db.session.role === "user" && db.session.email === userEmail) renderUserDashboard();
+        }, (index + 1) * 5000);
+      });
+    }
+
+    function rateOrderItem(orderId, productId, rating) {
+      const user = currentAccount();
+      if (!user || user.role !== "user") return;
+      const order = user.orders.find(o => o.id === orderId);
+      const item = order && order.items.find(i => i.productId === productId);
+      if (!item) return;
+      item.rating = rating;
+      save();
+      toast("Thanks for rating " + item.name + ".");
+      renderUserDashboard();
+    }
+
+    function renderVendorDashboard() {
+      const vendor = currentAccount();
+      if (!vendor || vendor.role !== "vendor") return page("login");
+      $("vendor-welcome").textContent = vendor.businessName + " • " + vendor.category;
+      $("profile-business").value = vendor.businessName;
+      $("profile-owner").value = vendor.ownerName;
+      $("profile-phone").value = vendor.phone;
+      $("profile-category").value = vendor.category;
+      $("profile-address").value = vendor.businessAddress;
+      fillVendorSettings(vendor);
+      renderProducts(vendor);
+      renderBookings(vendor);
+      renderMessages(vendor);
+      renderReviews(vendor);
+      renderPayments(vendor);
+      renderOffers(vendor);
+      renderSupport(vendor);
+      renderNotifications(vendor);
+      const bookings = db.bookings.filter(b => b.vendorEmail === vendor.email);
+      const ordersForVendor = vendorOrders(vendor.email);
+      const allRatings = [];
+      vendor.products.forEach(product => {
+        const summary = productRatingSummary(vendor.email, product.id);
+        if (summary.count) allRatings.push(summary.average);
+      });
+      $("metric-products").textContent = vendor.products.length;
+      $("metric-bookings").textContent = bookings.length;
+      $("metric-accepted").textContent = bookings.filter(b => b.status === "Accepted").length;
+      $("metric-payments").textContent = "₹" + ordersForVendor.filter(o => o.paymentStatus === "Paid").reduce((sum, o) => sum + Number(o.total || 0), 0).toLocaleString("en-IN");
+      $("metric-rating").textContent = allRatings.length ? (allRatings.reduce((sum, n) => sum + n, 0) / allRatings.length).toFixed(1) + " ★" : "No ratings";
+      $("metric-pending-payment").textContent = "₹" + ordersForVendor.filter(o => o.paymentStatus === "Pending").reduce((sum, o) => sum + Number(o.total || 0), 0).toLocaleString("en-IN");
+      $("metric-active-customers").textContent = new Set(ordersForVendor.map(o => o.customerEmail)).size;
+      $("metric-conversion").textContent = vendor.products.reduce((sum, p) => sum + (p.views || 0), 0) ? Math.min(100, Math.round((ordersForVendor.length / vendor.products.reduce((sum, p) => sum + (p.views || 0), 0)) * 100)) + "%" : "0%";
+      $("metric-retention").textContent = ordersForVendor.length ? Math.round((ordersForVendor.length - new Set(ordersForVendor.map(o => o.customerEmail)).size) / ordersForVendor.length * 100) + "%" : "0%";
+      renderCharts(vendor, ordersForVendor);
+    }
+
+    $("profile-form").addEventListener("submit", e => {
+      e.preventDefault();
+      const vendor = currentAccount();
+      vendor.businessName = $("profile-business").value.trim();
+      vendor.ownerName = $("profile-owner").value.trim();
+      vendor.phone = $("profile-phone").value.trim();
+      vendor.category = $("profile-category").value;
+      vendor.businessAddress = $("profile-address").value.trim();
+      save();
+      toast("Business profile updated.");
+      renderVendorDashboard();
+    });
+
+    $("product-form").addEventListener("submit", e => {
+      e.preventDefault();
+      const vendor = currentAccount();
+      const id = $("product-id").value || Date.now().toString();
+      const item = {
+        id,
+        name: $("product-name").value.trim(),
+        price: Number($("product-price").value),
+        desc: $("product-desc").value.trim(),
+        image: $("product-image").value.trim() || $("product-image-file").dataset.image || "",
+        video: $("product-video").value.trim(),
+        category: $("product-category").value.trim() || vendor.category,
+        tags: $("product-tags").value.trim(),
+        pricingType: $("product-pricing-type").value,
+        foodType: $("product-food-type").value,
+        available: $("product-available").value === "true",
+        views: 0
+      };
+      if (!item.name || !item.price) return toast("Product name and price are required.", "error");
+      const existing = vendor.products.find(p => p.id === id);
+      if (existing) {
+        if (!item.image) item.image = existing.image || "";
+        item.views = existing.views || 0;
+        Object.assign(existing, item);
+      }
+      else vendor.products.push(item);
+      $("product-id").value = "";
+      $("product-name").value = "";
+      $("product-price").value = "";
+      $("product-category").value = "";
+      $("product-tags").value = "";
+      $("product-pricing-type").value = "Fixed";
+      $("product-food-type").value = "veg";
+      $("product-available").value = "true";
+      $("product-image").value = "";
+      $("product-image-file").value = "";
+      $("product-image-file").dataset.image = "";
+      $("product-video").value = "";
+      $("product-desc").value = "";
+      $("product-submit").textContent = "Add Product";
+      save();
+      toast(existing ? "Product updated." : "Product added.");
+      renderVendorDashboard();
+    });
+
+    function renderProducts(vendor) {
+      $("product-list").innerHTML = vendor.products.length ? vendor.products.map(p => `
+        <div class="list-item">
+          ${p.image ? `<img class="product-photo-sm" src="${escapeHTML(p.image)}" alt="${escapeHTML(p.name)}" />` : ""}
+          <div><strong>${escapeHTML(p.name)}</strong><p class="muted">₹${Number(p.price).toLocaleString("en-IN")} • ${escapeHTML(p.pricingType || "Fixed")} • ${escapeHTML(p.category || vendor.category)} • ${p.available === false ? "Unavailable" : "Available"}</p><p class="muted">${escapeHTML(p.desc || "No description")}</p><p class="muted">Tags: ${escapeHTML(p.tags || "None")} • Views: ${p.views || 0}</p><p class="muted">Rating: ${productRatingSummary(vendor.email, p.id).count ? productRatingSummary(vendor.email, p.id).average.toFixed(1) + " ★ (" + productRatingSummary(vendor.email, p.id).count + ")" : "No ratings yet"}</p>${p.video ? `<p class="muted">Video: ${escapeHTML(p.video)}</p>` : ""}</div>
+          <div class="actions">
+            <button class="btn" data-edit-product="${p.id}">Edit</button>
+            <button class="btn btn-danger" data-delete-product="${p.id}">Delete</button>
+          </div>
+        </div>`).join("") : "<p class='muted'>No products or services added yet.</p>";
+      document.querySelectorAll("[data-edit-product]").forEach(btn => btn.addEventListener("click", () => {
+        const item = vendor.products.find(p => p.id === btn.dataset.editProduct);
+        $("product-id").value = item.id;
+        $("product-name").value = item.name;
+        $("product-price").value = item.price;
+        $("product-desc").value = item.desc;
+        $("product-category").value = item.category || "";
+        $("product-tags").value = item.tags || "";
+        $("product-pricing-type").value = item.pricingType || "Fixed";
+        $("product-food-type").value = item.foodType || "veg";
+        $("product-available").value = item.available === false ? "false" : "true";
+        $("product-image").value = item.image || "";
+        $("product-image-file").value = "";
+        $("product-image-file").dataset.image = "";
+        $("product-video").value = item.video || "";
+        $("product-submit").textContent = "Update Product";
+      }));
+      document.querySelectorAll("[data-delete-product]").forEach(btn => btn.addEventListener("click", () => {
+        vendor.products = vendor.products.filter(p => p.id !== btn.dataset.deleteProduct);
+        save();
+        toast("Product deleted.");
+        renderVendorDashboard();
+      }));
+    }
+
+    function renderBookings(vendor) {
+      const bookings = db.bookings.filter(b => b.vendorEmail === vendor.email);
+      $("booking-calendar").innerHTML = bookings.length ? bookings.map(b => `<div class="list-item"><div><strong>${escapeHTML(b.slot || "ASAP")}</strong><p class="muted">${escapeHTML(b.customer)} • ${escapeHTML(b.status)}</p></div></div>`).join("") : "<p class='muted'>No bookings on calendar yet.</p>";
+      $("booking-list").innerHTML = bookings.length ? bookings.map(b => `
+        <div class="list-item">
+          <div><strong>${escapeHTML(b.customer)}</strong><p class="muted">${escapeHTML(b.service)}</p><p class="muted">Payment: ${escapeHTML(b.paymentMethod || "UPI")} • ${escapeHTML(b.paymentStatus || "Pending")} • ₹${Number(b.amount || 0).toLocaleString("en-IN")}</p><p class="muted">Slot: ${escapeHTML(b.slot || "ASAP")}</p></div>
+          <div class="actions">
+            <span class="status ${b.status.toLowerCase().split(" ")[0]}">${b.status}</span>
+            <button class="btn btn-teal" data-booking-status="${b.id}:Accepted">Accept</button>
+            <button class="btn btn-danger" data-booking-status="${b.id}:Rejected">Reject</button>
+            <button class="btn" data-booking-status="${b.id}:Confirmed">Confirmed</button>
+            <button class="btn" data-booking-status="${b.id}:Completed">Completed</button>
+            <button class="btn btn-danger" data-booking-status="${b.id}:Cancelled">Cancel</button>
+            <button class="btn" data-reschedule-booking="${b.id}">Reschedule</button>
+          </div>
+        </div>`).join("") : "<p class='muted'>No inquiries or bookings yet.</p>";
+      document.querySelectorAll("[data-booking-status]").forEach(btn => btn.addEventListener("click", () => {
+        const [id, status] = btn.dataset.bookingStatus.split(":");
+        const booking = db.bookings.find(b => b.id === id);
+        booking.status = status;
+        const customer = db.users.find(user => (user.orders || []).some(order => order.id === id));
+        const order = customer && customer.orders.find(item => item.id === id);
+        if (order) {
+          order.status = status;
+          if (["Rejected", "Cancelled"].includes(status)) {
+            const breakdown = cancellationBreakdown(order);
+            order.paymentStatus = breakdown.refund > 0 ? "Partially Refunded" : "Refunded";
+            order.cancellation = breakdown;
+          }
+          if (status === "Accepted" || status === "Confirmed") scheduleOrderProgress(customer.email, order.id);
+          if (status === "Completed") {
+            order.status = "Delivered";
+            if (order.paymentMethod === "Cash on Delivery") order.paymentStatus = "Paid";
+          }
+          booking.paymentStatus = order.paymentStatus;
+          notifyCustomer(customer.email, "Order " + order.id + " updated to " + status + ".", "Status update");
+        }
+        notify(vendor.email, "Booking " + id + " moved to " + status + ".", "Booking");
+        save();
+        toast("Booking " + status.toLowerCase() + ".");
+        renderVendorDashboard();
+      }));
+      document.querySelectorAll("[data-reschedule-booking]").forEach(btn => btn.addEventListener("click", () => {
+        const booking = db.bookings.find(b => b.id === btn.dataset.rescheduleBooking);
+        const nextSlot = prompt("Enter new booking/delivery slot", booking.slot || "Tomorrow 7:00 PM");
+        if (!nextSlot) return;
+        booking.slot = nextSlot;
+        const customer = db.users.find(user => (user.orders || []).some(order => order.id === booking.id));
+        const order = customer && customer.orders.find(item => item.id === booking.id);
+        if (order) order.deliveryDetails = { ...(order.deliveryDetails || {}), slot: nextSlot };
+        notify(vendor.email, "Booking " + booking.id + " rescheduled to " + nextSlot + ".", "Booking");
+        save();
+        toast("Booking rescheduled.");
+        renderVendorDashboard();
+      }));
+    }
+
+    function fillVendorSettings(vendor) {
+      vendor.settings = vendor.settings || {};
+      $("settings-logo").value = vendor.settings.logo || "";
+      $("settings-banner").value = vendor.settings.banner || "";
+      $("settings-hours").value = vendor.settings.hours || "";
+      $("settings-days").value = vendor.settings.days || "";
+      $("settings-location").value = vendor.settings.location || vendor.businessAddress || "";
+      $("settings-service-area").value = vendor.settings.serviceArea || "";
+      $("settings-slots").value = vendor.settings.slots || "";
+      $("settings-availability").value = vendor.settings.availability || "Open";
+    }
+
+    function renderCharts(vendor, ordersForVendor) {
+      const weekly = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day, index) => ({ day, value: Math.max(1, (ordersForVendor.length + index) % 7 + (index === 5 ? 4 : 0)) }));
+      const maxWeekly = Math.max(...weekly.map(item => item.value), 1);
+      $("weekly-chart").innerHTML = weekly.map(item => `
+        <div class="bar-row"><span>${item.day}</span><div class="bar-track"><span class="bar-fill" style="width:${Math.round(item.value / maxWeekly * 100)}%"></span></div><span>${item.value} orders</span></div>
+      `).join("");
+      const sold = {};
+      ordersForVendor.forEach(order => (order.items || []).forEach(item => { sold[item.name] = (sold[item.name] || 0) + item.qty; }));
+      const top = Object.entries(sold).sort((a, b) => b[1] - a[1]).slice(0, 5);
+      $("top-products-list").innerHTML = top.length ? top.map(([name, qty]) => `<div class="list-item"><strong>${escapeHTML(name)}</strong><span>${qty} sold</span></div>`).join("") : "<p class='muted'>No product sales yet.</p>";
+    }
+
+    function renderMessages(vendor) {
+      const orders = vendorOrders(vendor.email);
+      const customers = [...new Map(orders.map(order => [order.customerEmail, order.customerName])).entries()];
+      $("message-customer").innerHTML = customers.length ? customers.map(([email, name]) => `<option value="${escapeHTML(email)}">${escapeHTML(name)} (${escapeHTML(email)})</option>`).join("") : "<option value=''>No customers yet</option>";
+      const messages = db.messages.filter(m => m.vendorEmail === vendor.email);
+      $("message-list").innerHTML = messages.length ? messages.slice().reverse().map(m => `<div class="list-item"><div><strong>${escapeHTML(m.from)}</strong><p class="muted">${escapeHTML(m.text)}</p><p class="muted">${escapeHTML(m.date)}</p></div></div>`).join("") : "<p class='muted'>No messages yet.</p>";
+    }
+
+    function renderReviews(vendor) {
+      const reviews = [];
+      db.users.forEach(user => (user.orders || []).forEach(order => {
+        if (order.vendorEmail !== vendor.email) return;
+        (order.items || []).forEach(item => {
+          if (item.rating) reviews.push({ user: user.name, orderId: order.id, productId: item.productId, product: item.name, rating: item.rating, reply: item.reply || "", reported: !!item.reported });
+        });
+      }));
+      $("review-list").innerHTML = reviews.length ? reviews.map(review => `
+        <div class="list-item">
+          <div><strong>${escapeHTML(review.product)} • ${review.rating} ★</strong><p class="muted">By ${escapeHTML(review.user)} on order ${escapeHTML(review.orderId)}</p><p class="muted">Reply: ${escapeHTML(review.reply || "No reply yet")}${review.reported ? " • Reported" : ""}</p></div>
+          <div class="actions"><button class="btn" data-review-reply="${review.orderId}:${review.productId}">Reply</button><button class="btn btn-danger" data-review-report="${review.orderId}:${review.productId}">Report</button></div>
+        </div>`).join("") : "<p class='muted'>No customer reviews yet.</p>";
+      document.querySelectorAll("[data-review-reply]").forEach(btn => btn.addEventListener("click", () => {
+        const [orderId, productId] = btn.dataset.reviewReply.split(":");
+        const reply = prompt("Reply to this review");
+        if (!reply) return;
+        db.users.forEach(user => (user.orders || []).forEach(order => {
+          if (order.id === orderId) {
+            const item = order.items.find(i => i.productId === productId);
+            if (item) item.reply = reply;
+          }
+        }));
+        save();
+        toast("Review reply saved.");
+        renderVendorDashboard();
+      }));
+      document.querySelectorAll("[data-review-report]").forEach(btn => btn.addEventListener("click", () => {
+        const [orderId, productId] = btn.dataset.reviewReport.split(":");
+        db.users.forEach(user => (user.orders || []).forEach(order => {
+          if (order.id === orderId) {
+            const item = order.items.find(i => i.productId === productId);
+            if (item) item.reported = true;
+          }
+        }));
+        save();
+        toast("Review reported.");
+        renderVendorDashboard();
+      }));
+    }
+
+    function renderPayments(vendor) {
+      const orders = vendorOrders(vendor.email);
+      const paidTotal = orders.filter(o => o.paymentStatus === "Paid").reduce((sum, o) => sum + Number(o.total || 0), 0);
+      $("withdraw-summary").textContent = paidTotal ? "Available balance: ₹" + paidTotal.toLocaleString("en-IN") : "No payout available yet.";
+      $("payment-history").innerHTML = orders.length ? orders.slice().reverse().map(order => `<div class="list-item"><div><strong>${escapeHTML(order.id)} • ${escapeHTML(order.customerName)}</strong><p class="muted">${escapeHTML(order.paymentMethod || "UPI")} • ${escapeHTML(order.paymentStatus || "Pending")} • ${escapeHTML(order.date)}</p></div><strong>₹${Number(order.total || 0).toLocaleString("en-IN")}</strong></div>`).join("") : "<p class='muted'>No payments yet.</p>";
+    }
+
+    function renderOffers(vendor) {
+      vendor.offers = vendor.offers || [];
+      $("offer-list").innerHTML = vendor.offers.length ? vendor.offers.map(offer => `<div class="list-item"><div><strong>${escapeHTML(offer.code)} • ${offer.discount}% off</strong><p class="muted">${escapeHTML(offer.desc || "Promotional campaign")}</p></div><span class="badge green">Active</span></div>`).join("") : "<p class='muted'>No promotions created yet.</p>";
+    }
+
+    function renderSupport(vendor) {
+      const tickets = db.supportTickets.filter(ticket => ticket.vendorEmail === vendor.email);
+      $("support-list").innerHTML = tickets.length ? tickets.slice().reverse().map(ticket => `<div class="list-item"><div><strong>${escapeHTML(ticket.subject)}</strong><p class="muted">${escapeHTML(ticket.message)}</p><p class="muted">${escapeHTML(ticket.status)} • ${escapeHTML(ticket.date)}</p></div></div>`).join("") : "<p class='muted'>No support tickets yet.</p>";
+    }
+
+    function renderNotifications(vendor) {
+      const alerts = db.notifications.filter(n => n.vendorEmail === vendor.email).slice(-4).reverse();
+      $("notification-list").innerHTML = alerts.length ? alerts.map(alert => `<div class="list-item"><div><strong>${escapeHTML(alert.type)}</strong><p class="muted">${escapeHTML(alert.message)}</p><p class="muted">${escapeHTML(alert.date)}</p></div></div>`).join("") : "<p class='muted'>No notifications yet.</p>";
+      if (!alerts.length) return;
+      $("vendor-welcome").textContent = vendor.businessName + " • " + vendor.category + " • " + alerts.length + " new alerts";
+    }
+
+    setNav();
+  </script>
+</body>
+</html>
